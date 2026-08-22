@@ -1,8 +1,10 @@
-import { AppState, Platform } from "react-native";
+import { AppState, Platform, type AppStateStatus } from "react-native";
 
 import {
   addGeofenceTriggerListener,
+  armBackgroundTracking,
   drainPendingRingingAlarmId,
+  pauseBackgroundTracking,
   startBackgroundTracking,
   stopBackgroundTracking,
   type NativeTrackedAlarm,
@@ -27,6 +29,9 @@ let appStateSubscription: { remove: () => void } | null = null;
 let nativeTriggerSubscription: { remove: () => void } | null = null;
 let reconciling: Promise<void> | null = null;
 let pendingReconcile = false;
+let lastAppState: AppStateStatus = AppState.currentState;
+let cachedActiveAlarms: GeoAlarm[] = [];
+let cachedNativeAlarms: NativeTrackedAlarm[] = [];
 
 function toNativeAlarms(alarms: GeoAlarm[]): NativeTrackedAlarm[] {
   return alarms.map((alarm) => {
@@ -64,6 +69,57 @@ function ongoingCopy(): OngoingTrackingCopy {
   };
 }
 
+function cacheNativeAlarms(alarms: GeoAlarm[]): NativeTrackedAlarm[] {
+  cachedActiveAlarms = alarms.filter((alarm) => alarm.isActive);
+  cachedNativeAlarms = toNativeAlarms(cachedActiveAlarms);
+  return cachedNativeAlarms;
+}
+
+/**
+ * Persist the current active alarms so native onPause can start the FGS
+ * without waiting for JS or AsyncStorage.
+ */
+export function primeLocationForeground(alarms: GeoAlarm[]): void {
+  if (Platform.OS !== "android") {
+    return;
+  }
+  const nativeAlarms = cacheNativeAlarms(alarms);
+  if (nativeAlarms.length === 0) {
+    void stopBackgroundTracking().catch((error) => {
+      console.warn("[Arrivo] Failed to disarm location tracking", error);
+    });
+    return;
+  }
+  void armBackgroundTracking(nativeAlarms, ongoingCopy()).catch((error) => {
+    console.warn("[Arrivo] Failed to arm location tracking", error);
+  });
+}
+
+function startTrackingFromCache(): void {
+  if (cachedNativeAlarms.length === 0) {
+    return;
+  }
+  void startBackgroundTracking(cachedNativeAlarms, ongoingCopy()).catch((error) => {
+    console.warn("[Arrivo] Failed to start location service on background", error);
+  });
+}
+
+function onAppStateChange(nextState: AppStateStatus): void {
+  lastAppState = nextState;
+  if (nextState === "active") {
+    if (cachedActiveAlarms.length > 0) {
+      void startProximityMonitor(cachedActiveAlarms);
+    }
+    void reconcileLocationForeground();
+    return;
+  }
+  // Do not wait for storage or reconcile: JS may freeze once backgrounded,
+  // and startForegroundService is often blocked after the activity has stopped.
+  startTrackingFromCache();
+  stopProximityMonitor();
+  void reconcileLocationForeground();
+}
+
 export async function reconcileLocationForeground(): Promise<void> {
   if (Platform.OS !== "android") {
     return;
@@ -76,22 +132,28 @@ export async function reconcileLocationForeground(): Promise<void> {
   reconciling = (async () => {
     try {
       const active = (await getAlarms()).filter((alarm) => alarm.isActive);
-      const appState = AppState.currentState;
+      const nativeAlarms = cacheNativeAlarms(active);
+      const copy = ongoingCopy();
 
-      if (active.length === 0) {
+      if (nativeAlarms.length === 0) {
         stopProximityMonitor();
         await stopBackgroundTracking();
         return;
       }
 
-      if (appState === "active") {
-        await stopBackgroundTracking();
+      // Always arm first so native onPause has payload even if we stay in the UI.
+      await armBackgroundTracking(nativeAlarms, copy);
+
+      if (lastAppState === "active") {
         await startProximityMonitor(active);
+        if (lastAppState === "active") {
+          await pauseBackgroundTracking();
+        }
         return;
       }
 
       stopProximityMonitor();
-      await startBackgroundTracking(toNativeAlarms(active), ongoingCopy());
+      await startBackgroundTracking(nativeAlarms, copy);
     } catch (error) {
       console.warn("[Arrivo] Failed to reconcile location foreground service", error);
     }
@@ -125,8 +187,9 @@ export function ensureLocationForegroundLifecycle(): () => void {
   }
 
   if (!appStateSubscription) {
-    appStateSubscription = AppState.addEventListener("change", () => {
-      void reconcileLocationForeground();
+    lastAppState = AppState.currentState;
+    appStateSubscription = AppState.addEventListener("change", (nextState) => {
+      onAppStateChange(nextState);
     });
   }
 

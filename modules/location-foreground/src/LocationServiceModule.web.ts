@@ -7,12 +7,21 @@ type LocationServiceEvents = {
 };
 
 class LocationServiceModule extends NativeModule<LocationServiceEvents> {
+  async armBackgroundTracking(
+    _alarmsJson: string,
+    _ongoingTitle: string,
+    _ongoingBody: string,
+    _copyJson: string,
+  ): Promise<void> {}
+
   async startBackgroundTracking(
     _alarmsJson: string,
     _ongoingTitle: string,
     _ongoingBody: string,
     _copyJson: string,
   ): Promise<void> {}
+
+  async pauseBackgroundTracking(): Promise<void> {}
 
   async stopBackgroundTracking(): Promise<void> {}
 

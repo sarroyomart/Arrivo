@@ -16,6 +16,31 @@ function native() {
   return getLocationServiceModule();
 }
 
+function copyJson(copy: OngoingTrackingCopy): string {
+  return JSON.stringify({
+    near: copy.near,
+    inside: copy.inside,
+    more: copy.more,
+    locale: copy.locale,
+  });
+}
+
+export async function armBackgroundTracking(
+  alarms: NativeTrackedAlarm[],
+  copy: OngoingTrackingCopy,
+): Promise<void> {
+  const module = native();
+  if (!module) {
+    return;
+  }
+  await module.armBackgroundTracking(
+    JSON.stringify(alarms),
+    copy.title,
+    copy.body,
+    copyJson(copy),
+  );
+}
+
 export async function startBackgroundTracking(
   alarms: NativeTrackedAlarm[],
   copy: OngoingTrackingCopy,
@@ -28,13 +53,16 @@ export async function startBackgroundTracking(
     JSON.stringify(alarms),
     copy.title,
     copy.body,
-    JSON.stringify({
-      near: copy.near,
-      inside: copy.inside,
-      more: copy.more,
-      locale: copy.locale,
-    }),
+    copyJson(copy),
   );
+}
+
+export async function pauseBackgroundTracking(): Promise<void> {
+  const module = native();
+  if (!module) {
+    return;
+  }
+  await module.pauseBackgroundTracking();
 }
 
 export async function stopBackgroundTracking(): Promise<void> {

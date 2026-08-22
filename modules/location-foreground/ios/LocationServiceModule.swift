@@ -6,7 +6,13 @@ public class LocationServiceModule: Module {
 
     Events("onGeofenceTriggered")
 
-    AsyncFunction("startBackgroundTracking") { (_alarmsJson: String, _ongoingTitle: String, _ongoingBody: String) in
+    AsyncFunction("armBackgroundTracking") { (_alarmsJson: String, _ongoingTitle: String, _ongoingBody: String, _copyJson: String) in
+    }
+
+    AsyncFunction("startBackgroundTracking") { (_alarmsJson: String, _ongoingTitle: String, _ongoingBody: String, _copyJson: String) in
+    }
+
+    AsyncFunction("pauseBackgroundTracking") {
     }
 
     AsyncFunction("stopBackgroundTracking") {

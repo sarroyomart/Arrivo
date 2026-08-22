@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import expo.modules.kotlin.exception.Exceptions
+import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -16,6 +17,7 @@ class LocationServiceModule : Module() {
 
     OnCreate {
       LocationForegroundBridge.module = this@LocationServiceModule
+      registerLifecycle()
     }
 
     OnDestroy {
@@ -24,13 +26,21 @@ class LocationServiceModule : Module() {
       }
     }
 
+    AsyncFunction("armBackgroundTracking") { alarmsJson: String, ongoingTitle: String, ongoingBody: String, copyJson: String ->
+      armTracking(alarmsJson, ongoingTitle, ongoingBody, copyJson)
+    }.runOnQueue(Queues.MAIN)
+
     AsyncFunction("startBackgroundTracking") { alarmsJson: String, ongoingTitle: String, ongoingBody: String, copyJson: String ->
       startTracking(alarmsJson, ongoingTitle, ongoingBody, copyJson)
-    }
+    }.runOnQueue(Queues.MAIN)
+
+    AsyncFunction("pauseBackgroundTracking") {
+      pauseTracking()
+    }.runOnQueue(Queues.MAIN)
 
     AsyncFunction("stopBackgroundTracking") {
       stopTracking()
-    }
+    }.runOnQueue(Queues.MAIN)
 
     AsyncFunction("updateActiveAlarms") { alarmsJson: String ->
       updateAlarms(alarmsJson)
@@ -57,12 +67,35 @@ class LocationServiceModule : Module() {
 
   private fun appContextOrThrow(): Context = requireContext().applicationContext
 
+  private fun registerLifecycle() {
+    try {
+      LocationForegroundLifecycle.ensureRegistered(appContextOrThrow())
+    } catch (_: Exception) {
+    }
+  }
+
+  private fun armTracking(
+    alarmsJson: String,
+    ongoingTitle: String,
+    ongoingBody: String,
+    copyJson: String,
+  ) {
+    val context = appContextOrThrow()
+    LocationForegroundLifecycle.ensureRegistered(context)
+    if (alarmsJson.isBlank() || alarmsJson == "[]" || TrackedAlarm.parseList(alarmsJson).isEmpty()) {
+      LocationForegroundStore.clear(context)
+      return
+    }
+    LocationForegroundStore.save(context, alarmsJson, ongoingTitle, ongoingBody, copyJson)
+  }
+
   private fun startTracking(
     alarmsJson: String,
     ongoingTitle: String,
     ongoingBody: String,
     copyJson: String,
   ) {
+    armTracking(alarmsJson, ongoingTitle, ongoingBody, copyJson)
     val context = appContextOrThrow()
     val intent = LocationForegroundService.startIntent(
       context,
@@ -80,14 +113,32 @@ class LocationServiceModule : Module() {
       stopTracking()
       return
     }
+    LocationForegroundStore.load(context)?.let { armed ->
+      LocationForegroundStore.save(
+        context,
+        alarmsJson,
+        armed.ongoingTitle,
+        armed.ongoingBody,
+        armed.copyJson,
+      )
+    }
     if (!LocationForegroundService.isRunning.get()) {
       return
     }
     startService(context, LocationForegroundService.updateIntent(context, alarmsJson), foreground = false)
   }
 
+  private fun pauseTracking() {
+    val context = appContextOrThrow()
+    if (!LocationForegroundService.isRunning.get()) {
+      return
+    }
+    startService(context, LocationForegroundService.pauseIntent(context), foreground = false)
+  }
+
   private fun stopTracking() {
     val context = appContextOrThrow()
+    LocationForegroundStore.clear(context)
     if (!LocationForegroundService.isRunning.get()) {
       try {
         context.stopService(LocationForegroundService.stopIntent(context))
@@ -107,7 +158,11 @@ class LocationServiceModule : Module() {
       }
     } catch (error: Exception) {
       Log.w(LocationForegroundBridge.TAG, "Unable to start location service", error)
-      throw error
+      if (foreground) {
+        LocationForegroundLifecycle.startArmed(context)
+      } else {
+        throw error
+      }
     }
   }
 

@@ -89,19 +89,30 @@ class LocationForegroundService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val action = intent?.action
     if (action == ACTION_STOP) {
+      LocationForegroundStore.clear(this)
+      shutdown()
+      return START_NOT_STICKY
+    }
+    if (action == ACTION_PAUSE) {
       shutdown()
       return START_NOT_STICKY
     }
 
-    intent?.getStringExtra(EXTRA_ONGOING_TITLE)?.takeIf { it.isNotBlank() }?.let {
-      ongoingTitle = it
-    }
-    intent?.getStringExtra(EXTRA_ONGOING_BODY)?.takeIf { it.isNotBlank() }?.let {
-      ongoingBody = it
-    }
-    applyCopyJson(intent?.getStringExtra(EXTRA_ONGOING_COPY_JSON))
+    val stored = LocationForegroundStore.load(this)
+    val title = intent?.getStringExtra(EXTRA_ONGOING_TITLE)?.takeIf { it.isNotBlank() }
+      ?: stored?.ongoingTitle
+    val body = intent?.getStringExtra(EXTRA_ONGOING_BODY)?.takeIf { it.isNotBlank() }
+      ?: stored?.ongoingBody
+    val copyJson = intent?.getStringExtra(EXTRA_ONGOING_COPY_JSON)?.takeIf { it.isNotBlank() }
+      ?: stored?.copyJson
+    val alarmsJson = intent?.getStringExtra(EXTRA_ALARMS_JSON)?.takeIf { it.isNotBlank() }
+      ?: stored?.alarmsJson
 
-    val parsed = TrackedAlarm.parseList(intent?.getStringExtra(EXTRA_ALARMS_JSON))
+    title?.let { ongoingTitle = it }
+    body?.let { ongoingBody = it }
+    applyCopyJson(copyJson)
+
+    val parsed = TrackedAlarm.parseList(alarmsJson)
     alarms = parsed
     insideIds.retainAll(parsed.map { it.id }.toSet())
     firedIds.retainAll(parsed.map { it.id }.toSet())
@@ -125,11 +136,19 @@ class LocationForegroundService : Service() {
       return START_NOT_STICKY
     }
 
+    LocationForegroundStore.save(
+      this,
+      alarmsJson ?: "[]",
+      ongoingTitle,
+      ongoingBody,
+      copyJson.orEmpty(),
+    )
     startLocationUpdates()
-    return START_NOT_STICKY
+    return START_STICKY
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {
+    LocationForegroundStore.clear(this)
     shutdown()
     super.onTaskRemoved(rootIntent)
   }
@@ -667,6 +686,7 @@ class LocationForegroundService : Service() {
   companion object {
     const val ACTION_START = "expo.modules.locationforeground.START"
     const val ACTION_STOP = "expo.modules.locationforeground.STOP"
+    const val ACTION_PAUSE = "expo.modules.locationforeground.PAUSE"
     const val ACTION_UPDATE = "expo.modules.locationforeground.UPDATE"
     const val EXTRA_ALARMS_JSON = "alarmsJson"
     const val EXTRA_ONGOING_TITLE = "ongoingTitle"
@@ -712,10 +732,39 @@ class LocationForegroundService : Service() {
       }
     }
 
+    fun pauseIntent(context: Context): Intent {
+      return Intent(context, LocationForegroundService::class.java).apply {
+        action = ACTION_PAUSE
+      }
+    }
+
     fun updateIntent(context: Context, alarmsJson: String): Intent {
       return Intent(context, LocationForegroundService::class.java).apply {
         action = ACTION_UPDATE
         putExtra(EXTRA_ALARMS_JSON, alarmsJson)
+      }
+    }
+
+    fun startFromArmed(context: Context, armed: ArmedTracking) {
+      if (!armed.hasAlarms) {
+        return
+      }
+      val app = context.applicationContext
+      val intent = startIntent(
+        app,
+        armed.alarmsJson,
+        armed.ongoingTitle,
+        armed.ongoingBody,
+        armed.copyJson,
+      )
+      try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          app.startForegroundService(intent)
+        } else {
+          app.startService(intent)
+        }
+      } catch (error: Exception) {
+        Log.w(LocationForegroundBridge.TAG, "Unable to start location service from lifecycle", error)
       }
     }
   }

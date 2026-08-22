@@ -7,12 +7,19 @@ type LocationServiceEvents = {
 };
 
 declare class LocationServiceModule extends NativeModule<LocationServiceEvents> {
+  armBackgroundTracking(
+    alarmsJson: string,
+    ongoingTitle: string,
+    ongoingBody: string,
+    copyJson: string,
+  ): Promise<void>;
   startBackgroundTracking(
     alarmsJson: string,
     ongoingTitle: string,
     ongoingBody: string,
     copyJson: string,
   ): Promise<void>;
+  pauseBackgroundTracking(): Promise<void>;
   stopBackgroundTracking(): Promise<void>;
   updateActiveAlarms(alarmsJson: string): Promise<void>;
   drainPendingRingingAlarmId(): Promise<string | null>;

@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import { stopBackgroundTracking } from "@/modules/location-foreground";
 import { MAX_ACTIVE_GEOFENCES } from "@/src/constants";
 import { syncActiveRegions } from "@/src/services/geofencing";
+import { primeLocationForeground } from "@/src/services/locationForeground";
 import { cancelSnoozeNotification } from "@/src/services/notifications";
 import {
   deleteAlarm,
@@ -44,7 +45,9 @@ export function useAlarms() {
   const refreshAlarms = useCallback(async () => {
     try {
       setError(null);
-      setAlarms(await getAlarms());
+      const loaded = await getAlarms();
+      setAlarms(loaded);
+      primeLocationForeground(loaded);
     } catch (caught) {
       setError(caught instanceof Error ? caught : new Error("loadAlarms"));
       setAlarms([]);
@@ -70,6 +73,10 @@ export function useAlarms() {
 
       try {
         await upsertAlarm(alarm);
+        const nextAlarms = alarms.some((item) => item.id === alarm.id)
+          ? alarms.map((item) => (item.id === alarm.id ? alarm : item))
+          : [...alarms, alarm];
+        primeLocationForeground(nextAlarms);
         const nextActive = alarm.isActive
           ? activeCountExcluding(alarms, alarm.id) + 1
           : activeCountExcluding(alarms, alarm.id);
@@ -90,6 +97,8 @@ export function useAlarms() {
       try {
         await deleteAlarm(id);
         await cancelSnoozeNotification(id);
+        const nextAlarms = alarms.filter((item) => item.id !== id);
+        primeLocationForeground(nextAlarms);
         await stopTrackingIfNoActiveAlarms(activeCountExcluding(alarms, id));
         await syncActiveRegions();
         await refreshAlarms();
@@ -115,6 +124,10 @@ export function useAlarms() {
         if (!isActive) {
           await cancelSnoozeNotification(id);
         }
+        const nextAlarms = alarms.map((item) =>
+          item.id === id ? { ...item, isActive, updatedAt: Date.now() } : item,
+        );
+        primeLocationForeground(nextAlarms);
         const nextActive = isActive
           ? activeCountExcluding(alarms, id) + 1
           : activeCountExcluding(alarms, id);
