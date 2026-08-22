@@ -186,7 +186,7 @@ El perfil `development` en [`eas.json`](eas.json) (`developmentClient: true`, `d
 |------------|-----|
 | `development` | Development client interno (este MVP) |
 | `preview` | Build interno sin dev client |
-| `production` | Store / release |
+| `production` | Store / AAB (`autoIncrement`, `buildType: app-bundle`, sin `developmentClient`) |
 
 ---
 
@@ -199,7 +199,7 @@ El perfil `development` en [`eas.json`](eas.json) (`developmentClient: true`, `d
 | Mapa interactivo (home, map picker, preview) | MapLibre + teselas vectoriales **OpenFreeMap** | [`src/components/OsmMap.tsx`](src/components/OsmMap.tsx) · estilos en [`src/constants/map.ts`](src/constants/map.ts) |
 | Búsqueda / reverse geocode | **Nominatim** (OpenStreetMap) | [`src/services/nominatim.ts`](src/services/nominatim.ts) |
 
-Atribución en UI: `© OpenStreetMap` (`OSM_ATTRIBUTION`). MapLibre pinta también su atribución nativa. No hay teselas ráster ni `react-native-maps`.
+Atribución en UI: `© OpenStreetMap contributors` (enlace a [osm.org/copyright](https://www.openstreetmap.org/copyright)). MapLibre pinta también su atribución nativa. No hay teselas ráster ni `react-native-maps`.
 
 ### Teselas vectoriales (OpenFreeMap)
 
@@ -210,15 +210,16 @@ El mapa usa estilos sin clave:
 
 ### Nominatim
 
-Búsqueda y reverse geocoding contra `https://nominatim.openstreetmap.org`, con:
+Búsqueda (solo al pulsar buscar, no a cada tecla) y reverse geocoding contra Nominatim, con:
 
-- Header **`User-Agent: Arrivo-App`** (obligatorio por la [política de Nominatim](https://operations.osmfoundation.org/policies/nominatim/))
+- Header **`User-Agent: Arrivo/1.0 (https://github.com/sarroyomart/Arrivo; …/issues)`** y `Referer` (política de [Nominatim](https://operations.osmfoundation.org/policies/nominatim/))
 - `Accept-Language` según el locale del dispositivo
-- Throttle de **1 petición / segundo** y timeout de 8 s
+- Throttle de **1 petición / segundo**, caché en memoria y timeout de 8 s
+- Endpoint configurable en [`config/geocoder.json`](config/geocoder.json) (la app lo lee en remoto al arrancar para poder cambiar de servidor sin actualizar la store)
 
-La geocodificación es **opcional** (caja de búsqueda). Las alarmas y el geofencing funcionan 100 % offline una vez guardadas las coordenadas.
+La geocodificación es **opcional** (caja de búsqueda). Las alarmas y el geofencing funcionan sin red una vez guardadas las coordenadas. El mapa y Nominatim sí usan Internet.
 
-Para cambiar de proveedor de teselas o de geocoder, edita solo [`src/constants/map.ts`](src/constants/map.ts) y [`src/services/nominatim.ts`](src/services/nominatim.ts).
+Para cambiar teselas, edita [`src/constants/map.ts`](src/constants/map.ts). Para cambiar el geocoder, edita `config/geocoder.json` (y súbelo al repo).
 
 ---
 
@@ -381,7 +382,7 @@ Arrivo/
 │   │   ├── geofencing.ts       # syncActiveRegions (máx. 20)
 │   │   ├── notifications.ts    # Canal MAX + notificación local
 │   │   ├── alarmAudio.ts       # expo-audio loop
-│   │   ├── nominatim.ts        # Búsqueda OSM (User-Agent: Arrivo-App)
+│   │   ├── nominatim.ts        # Búsqueda OSM (al confirmar; User-Agent Arrivo/1.0)
 │   │   └── mapPickerResult.ts  # Puente picker → editor
 │   ├── tasks/
 │   │   └── geofencingTask.ts   # defineTask ARRIVO_GEOFENCE (scope global)
@@ -422,4 +423,4 @@ No forman parte de esta versión: repetición por días de la semana, Wi‑Fi co
 
 ## Licencia y privacidad
 
-Uso personal / proyecto privado (`"private": true`). La ubicación se usa **solo en el dispositivo** para vigilar geocercas. Nominatim recibe consultas de búsqueda si el usuario busca una dirección; no hay analítica propia ni cuenta de usuario.
+Uso personal / proyecto privado (`"private": true`). El GPS de las alarmas se procesa en el dispositivo. Nominatim recibe la consulta si el usuario pulsa buscar; OpenFreeMap sirve las teselas del mapa. Política de privacidad: [`Docs/privacy-policy.md`](Docs/privacy-policy.md). Declaraciones de Play Console (Data Safety, FGS, ubicación): [`Docs/play-console.md`](Docs/play-console.md). Avisos Apache / OFL: [`NOTICE`](NOTICE).

@@ -22,6 +22,7 @@ import {
 import { usePalette } from "@/src/hooks/usePalette";
 import { I18nProvider, useTranslation } from "@/src/i18n";
 import { syncActiveRegions } from "@/src/services/geofencing";
+import { ensureGeocoderConfig } from "@/src/services/geocoderConfig";
 import { ensureLocationForegroundLifecycle } from "@/src/services/locationForeground";
 import {
   consumePendingRingingAlarmId,
@@ -44,6 +45,7 @@ function RootNavigator() {
 
   useEffect(() => {
     void ensureAlarmNotificationChannel();
+    void ensureGeocoderConfig();
   }, []);
 
   useEffect(() => {
@@ -155,6 +157,8 @@ function RootNavigator() {
         name="onboarding"
         options={{ title: t("nav.onboarding"), headerShown: false, animation: "fade" }}
       />
+      <Stack.Screen name="privacy" options={{ title: t("nav.privacy") }} />
+      <Stack.Screen name="licenses" options={{ title: t("nav.licenses") }} />
     </Stack>
   );
 }

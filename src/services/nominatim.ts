@@ -1,12 +1,15 @@
 import { getLocales } from "expo-localization";
 
-import { isValidCoordinate, type MapCoordinate } from "@/src/constants";
+import { isValidCoordinate, LEGAL_URLS, type MapCoordinate } from "@/src/constants";
 import type { Locale } from "@/src/i18n/types";
+import {
+  ensureGeocoderConfig,
+  getGeocoderConfigSync,
+} from "@/src/services/geocoderConfig";
 import { haversineMeters } from "@/src/utils/geo";
 
-const NOMINATIM_BASE = "https://nominatim.openstreetmap.org";
-const NOMINATIM_USER_AGENT = "Arrivo-App";
 const MIN_REQUEST_INTERVAL_MS = 1000;
+const SEARCH_CACHE_LIMIT = 40;
 const REQUEST_TIMEOUT_MS = 8000;
 const SEARCH_LIMIT = 7;
 /** ~0.5° (~55 km) box: prefer nearby matches without hiding other areas. */
@@ -76,6 +79,18 @@ type RankedPlace = NominatimPlace & {
 
 let lastRequestAt = 0;
 let requestChain: Promise<void> = Promise.resolve();
+const searchCache = new Map<string, NominatimPlace[]>();
+const reverseCache = new Map<string, string>();
+
+function rememberSearch(key: string, places: NominatimPlace[]): void {
+  searchCache.set(key, places);
+  if (searchCache.size > SEARCH_CACHE_LIMIT) {
+    const first = searchCache.keys().next().value;
+    if (first !== undefined) {
+      searchCache.delete(first);
+    }
+  }
+}
 
 /**
  * Prefer the country's local names (Calle de Alcalá, España) over English
@@ -194,7 +209,8 @@ async function nominatimFetch(url: string, language: string): Promise<Response> 
         headers: {
           Accept: "application/json",
           "Accept-Language": language,
-          "User-Agent": NOMINATIM_USER_AGENT,
+          "User-Agent": getGeocoderConfigSync().userAgent,
+          Referer: LEGAL_URLS.github,
         },
         signal: controller.signal,
       });
@@ -619,7 +635,7 @@ async function requestPlaces(
   parsed: ParsedAddressQuery | null,
   proximity: MapCoordinate | null,
 ): Promise<RankedPlace[]> {
-  const url = `${NOMINATIM_BASE}/search?${params.toString()}`;
+  const url = `${getGeocoderConfigSync().nominatimBaseUrl}/search?${params.toString()}`;
   try {
     const response = await nominatimFetch(url, language);
     if (!response.ok) {
@@ -709,7 +725,18 @@ export async function searchPlaces(
       return [];
     }
 
+    await ensureGeocoderConfig();
     const language = nominatimLanguage(options.language);
+    const cacheKey = [
+      language,
+      trimmed.toLowerCase(),
+      options.userLat?.toFixed(3) ?? "",
+      options.userLon?.toFixed(3) ?? "",
+    ].join("|");
+    const cached = searchCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const proximity = resolveUserCoordinate(options);
     const parsed = parseAddressQuery(trimmed);
     const withGeometry = parsed !== null;
@@ -731,24 +758,32 @@ export async function searchPlaces(
     };
 
     if (!parsed) {
-      return (await run("freeform")).map(publicPlace);
+      const places = (await run("freeform")).map(publicPlace);
+      rememberSearch(cacheKey, places);
+      return places;
     }
 
     const structured = await run("structured");
     if (hasExactLocalHouse(structured, parsed)) {
-      return structured.map(publicPlace);
+      const places = structured.map(publicPlace);
+      rememberSearch(cacheKey, places);
+      return places;
     }
 
     // OSM often has the street but not the portal. Keep the local street and
     // pin the requested number on it — never promote "24" from another city.
     if (structured.length > 0) {
-      return attachHouseIfMissing(structured, parsed).map(publicPlace);
+      const places = attachHouseIfMissing(structured, parsed).map(publicPlace);
+      rememberSearch(cacheKey, places);
+      return places;
     }
 
     const freeform = await run("freeform");
-    return attachHouseIfMissing(mergePlaces([structured, freeform]), parsed).map(
+    const places = attachHouseIfMissing(mergePlaces([structured, freeform]), parsed).map(
       publicPlace,
     );
+    rememberSearch(cacheKey, places);
+    return places;
   } catch {
     return [];
   }
@@ -759,7 +794,13 @@ export async function reverseGeocode(
   lon: number,
   appLocale: Locale,
 ): Promise<string> {
+  await ensureGeocoderConfig();
   const language = nominatimLanguage(appLocale);
+  const cacheKey = `${language}|${lat.toFixed(5)}|${lon.toFixed(5)}`;
+  const cached = reverseCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
   const params = new URLSearchParams({
     lat: String(lat),
     lon: String(lon),
@@ -767,7 +808,7 @@ export async function reverseGeocode(
     addressdetails: "1",
     "accept-language": language,
   });
-  const url = `${NOMINATIM_BASE}/reverse?${params.toString()}`;
+  const url = `${getGeocoderConfigSync().nominatimBaseUrl}/reverse?${params.toString()}`;
 
   try {
     const response = await nominatimFetch(url, language);
@@ -775,7 +816,9 @@ export async function reverseGeocode(
       return "";
     }
     const payload = (await response.json()) as NominatimSearchItem & NominatimReverseResult;
-    return formatPlaceLabel(payload).label || asText(payload.display_name);
+    const label = formatPlaceLabel(payload).label || asText(payload.display_name);
+    reverseCache.set(cacheKey, label);
+    return label;
   } catch {
     return "";
   }

@@ -31,6 +31,7 @@ export {
   zoomForRadius,
 } from "./map";
 export type { MapCoordinate } from "./map";
+export { APP_USER_AGENT, LEGAL_URLS } from "./legal";
 export {
   DEFAULT_ZONE_COLOR,
   GEOFENCE_FILL_OPACITY,

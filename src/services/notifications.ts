@@ -249,7 +249,7 @@ export async function ensureAlarmNotificationChannel(): Promise<void> {
       return Notifications.setNotificationChannelAsync(channel.id, {
         name: t("alarmNotification.channelName"),
         importance: Notifications.AndroidImportance.MAX,
-        bypassDnd: !channel.silent,
+        bypassDnd: false,
         description: t("alarmNotification.title"),
         enableLights: true,
         enableVibrate: true,

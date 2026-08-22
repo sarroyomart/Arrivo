@@ -13,7 +13,6 @@ const LOCK_SCREEN_PERMISSIONS = [
   "android.permission.USE_FULL_SCREEN_INTENT",
   "android.permission.WAKE_LOCK",
   "android.permission.VIBRATE",
-  "android.permission.ACCESS_NOTIFICATION_POLICY",
 ];
 
 const BUILDER_MARKER = "ARRIVO_FULL_SCREEN_INTENT";

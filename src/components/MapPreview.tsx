@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Platform, Text, View } from "react-native";
 import { Marker } from "@maplibre/maplibre-react-native";
 
-import { GeofenceLayer } from "@/src/components/GeofenceLayer";
 import { AlarmMapMarker } from "@/src/components/AlarmMapMarker";
+import { GeofenceLayer } from "@/src/components/GeofenceLayer";
+import { OsmAttribution } from "@/src/components/OsmAttribution";
 import { OsmMap } from "@/src/components/OsmMap";
 import {
   isValidCoordinate,
-  OSM_ATTRIBUTION,
   zoomForRadius,
 } from "@/src/constants";
 import { usePalette } from "@/src/hooks/usePalette";
@@ -44,7 +44,7 @@ export function MapPreview({
 
   return (
     <View
-      pointerEvents="none"
+      pointerEvents="box-none"
       className={cn(
         "h-36 overflow-hidden bg-map",
         flush ? "rounded-none" : "rounded-card shadow-map",
@@ -61,29 +61,34 @@ export function MapPreview({
           </Text>
         </View>
       ) : (
-        <OsmMap
-          center={coordinate}
-          zoom={zoomForRadius(radius)}
-          className="flex-1"
-        >
-          <GeofenceLayer
-            latitude={coordinate.latitude}
-            longitude={coordinate.longitude}
-            radius={radius}
-            color={color}
-          />
-          <Marker
-            id="preview-pin"
-            lngLat={[coordinate.longitude, coordinate.latitude]}
-            anchor="center"
+        <View pointerEvents="none" className="flex-1">
+          <OsmMap
+            center={coordinate}
+            zoom={zoomForRadius(radius)}
+            className="flex-1"
           >
-            <AlarmMapMarker color={color} icon={icon} size={28} />
-          </Marker>
-        </OsmMap>
+            <GeofenceLayer
+              latitude={coordinate.latitude}
+              longitude={coordinate.longitude}
+              radius={radius}
+              color={color}
+            />
+            <Marker
+              id="preview-pin"
+              lngLat={[coordinate.longitude, coordinate.latitude]}
+              anchor="center"
+            >
+              <AlarmMapMarker color={color} icon={icon} size={28} />
+            </Marker>
+          </OsmMap>
+        </View>
       )}
       {hasLocation && Platform.OS !== "web" ? (
-        <View className="absolute bottom-space-1 right-space-2 rounded-control bg-card px-space-2 py-space-1">
-          <Text className="typo-caption">{OSM_ATTRIBUTION}</Text>
+        <View
+          pointerEvents="auto"
+          className="absolute bottom-space-1 right-space-2 rounded-control bg-card px-space-2 py-space-1"
+        >
+          <OsmAttribution />
         </View>
       ) : null}
     </View>

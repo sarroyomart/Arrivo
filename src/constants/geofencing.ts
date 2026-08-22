@@ -22,6 +22,7 @@ export const STORAGE_KEYS = {
   ringingAlarmId: "@arrivo_ringingAlarmId",
   onboardingCompleted: "@arrivo_onboarding_completed",
   locale: "@arrivo_locale",
+  geocoderConfig: "@arrivo_geocoder_config",
 } as const;
 
 export const ANDROID_ALARM_CHANNEL_ID = "arrivo_alarm_channel_v2";

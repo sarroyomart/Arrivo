@@ -11,6 +11,8 @@ export const es: Messages = {
     mapPicker: "Elegir ubicación",
     ringing: "Alarma",
     onboarding: "Información",
+    privacy: "Privacidad",
+    licenses: "Licencias",
   },
   screens: {
     home: {
@@ -33,6 +35,8 @@ export const es: Messages = {
     mapPicker: {
       title: "Elegir ubicación",
       searchPlaceholder: "Calle y número, o un lugar",
+      searchHint: "Escribe la dirección y pulsa buscar. La consulta se envía a OpenStreetMap Nominatim.",
+      searchAction: "Buscar",
       confirm: "Confirmar ubicación",
       hint: "Toca el mapa para colocar el pin.",
       locating: "Centrando en tu ubicación…",
@@ -48,17 +52,19 @@ export const es: Messages = {
     onboarding: {
       title: "Configuración esencial para que tus alarmas funcionen",
       subtitle: "{{count}} permisos, en este orden. Te explicamos por qué hace falta cada uno.",
-      privacyTitle: "Ubicación solo en trayectos, 100% local",
+      privacyTitle: "Ubicación en el dispositivo; mapa y búsqueda usan red",
       privacy:
-        "La app lee tu ubicación mientras la usas. Si hay una alarma activa y pasas la app a segundo plano, aparece una notificación persistente (“Arrivo activo”) para seguir vigilando el destino. Si cierras la app o apagas todas las alarmas, el seguimiento y la notificación desaparecen. No hay rastreo permanente ni historial, y las coordenadas no se envían a servidores externos.",
+        "Las alarmas y el GPS del trayecto se procesan en este teléfono. No hay cuenta ni historial en nuestros servidores (no tenemos backend). Si buscas una dirección, la consulta y un área aproximada se envían a Nominatim (OpenStreetMap). El mapa descarga teselas de OpenFreeMap (Cloudflare). Si hay una alarma activa y pasas la app a segundo plano, aparece la notificación “Arrivo activo”. Si cierras la app o apagas todas las alarmas, el seguimiento se detiene.",
       skipTitle: "¿Continuar sin todos los permisos?",
       skipBody:
         "Sin ubicación o sin notificaciones, la alarma puede no sonar. En Android no hace falta el permiso “Permitir todo el tiempo”: con una alarma activa y la app en segundo plano verás una notificación de seguimiento. Podrás activar los permisos más tarde en Ajustes.",
+      openPrivacy: "Política de privacidad",
+      openLicenses: "Licencias de código abierto",
     },
     guide: {
       title: "Cómo usar Arrivo",
       subtitle:
-        "Te avisamos al llegar o al salir de un sitio que hayas guardado. La ubicación se queda en este dispositivo.",
+        "Te avisamos al llegar o al salir de un sitio que hayas guardado. El GPS de la alarma se queda en este dispositivo; buscar direcciones y ver el mapa usa Internet.",
       createTitle: "Crea un destino",
       createBody:
         "Pulsa + en la lista. Ponle un nombre, elige el punto en el mapa, el radio, el color, el icono y cómo quieres que suene.",
@@ -79,7 +85,7 @@ export const es: Messages = {
   permissions: {
     locationWhenInUse: {
       title: "Ubicación mientras usas la app",
-      body: "Se usa para buscar lugares y ver tu posición mientras la app está abierta. Elige “Permitir solo mientras la app está en uso”. Las coordenadas se quedan en este dispositivo: no se envían a ningún servidor.",
+      body: "Se usa para buscar lugares y ver tu posición mientras la app está abierta. Elige “Permitir solo mientras la app está en uso”. Las alarmas se guardan en este dispositivo. Si buscas una dirección, Nominatim (OpenStreetMap) recibe el texto y un área aproximada; el mapa carga teselas de OpenFreeMap.",
       footnote:
         "Si hay una alarma activa y pasas la app a segundo plano (pantalla apagada o cambias de app), verás la notificación persistente “Arrivo activo / Vigilando tus alarmas de destino”. No pedimos el permiso invasivo “Permitir todo el tiempo”. Si cierras la app o apagas todas las alarmas, la notificación desaparece al instante.",
     },
@@ -87,7 +93,7 @@ export const es: Messages = {
       title: "Ubicación en segundo plano durante trayectos",
       body: "Con alarmas activas, la app puede leer tu ubicación con la pantalla apagada o la app minimizada, solo para detectar la geocerca de ese trayecto. No hay rastreo permanente ni historial.",
       footnote:
-        "100% local y offline: no enviamos coordenadas a servidores externos. El permiso “siempre” de iOS/Android es el que permite el segundo plano durante el viaje, no un seguimiento continuo.",
+        "El permiso “siempre” de iOS permite el segundo plano durante el viaje, no un seguimiento continuo. No enviamos el GPS del trayecto a nuestro servidor (no hay backend). Buscar una dirección o cargar el mapa sí usa servicios de terceros, como se explica en la política de privacidad.",
     },
     notifications: {
       title: "Notificaciones de alta prioridad",
@@ -127,6 +133,29 @@ export const es: Messages = {
     edit: "Editar",
     distance: "A {{distance}}",
     unknown_distance: "Calculando distancia…",
+  },
+  legal: {
+    privacyUpdated: "Última actualización: 22 de agosto de 2026.",
+    localTitle: "Qué se queda en el teléfono",
+    localBody:
+      "Títulos de alarmas, coordenadas de destinos, radios, sonidos personalizados y el idioma se guardan solo en este dispositivo (AsyncStorage y archivos locales). No hay cuenta, inicio de sesión ni analítica propia. El GPS del trayecto lo usa el servicio en primer plano de Android o las geocercas de iOS para decidir si has cruzado una zona; no lo subimos a un servidor nuestro.",
+    networkTitle: "Qué sale a Internet",
+    networkBody:
+      "Si pulsas Buscar en el mapa, el texto de la dirección y un recuadro aproximado (si hay GPS) se envían a Nominatim, el geocodificador público de OpenStreetMap Foundation. Si tocas el mapa, se puede pedir a Nominatim el nombre del lugar (geocodificación inversa). Al mostrar el mapa se descargan teselas vectoriales de OpenFreeMap, que puede usar Cloudflare: eso revela la zona que estás viendo, no un historial de trayectos.",
+    audioTitle: "Audio",
+    audioBody:
+      "Puedes elegir un archivo de audio del dispositivo como tono. Se copia a la carpeta de la app y no se envía a ningún servidor.",
+    thirdPartiesTitle: "Terceros",
+    thirdPartiesBody:
+      "OpenStreetMap Foundation (Nominatim, Reino Unido), Hyperknot Software Kft. / OpenFreeMap (Hungría) y Cloudflare (red de entrega de teselas). Google Play Services puede usarse en Android para la ubicación fusionada en el dispositivo. No usamos AdMob ni identificador de publicidad en esta versión.",
+    rightsTitle: "Tus opciones",
+    rightsBody:
+      "Puedes borrar alarmas en la app o desinstalar Arrivo para eliminar los datos locales. No hay perfil en la nube que solicitar. El mapa muestra “© OpenStreetMap contributors”; los datos cartográficos están bajo ODbL.",
+    openInBrowser: "Abrir política completa",
+    licensesIntro:
+      "Arrivo incluye software de código abierto. Estas son las licencias principales del binario y de los datos del mapa.",
+    licensesList:
+      "Expo SDK, React Native y librerías relacionadas — MIT / Apache 2.0\nMapLibre React Native — MIT\nOpenStreetMap (datos del mapa y Nominatim) — ODbL\nOpenFreeMap / teselas — MIT del proyecto; datos OSM bajo ODbL\nInter (tipografía) — SIL Open Font License 1.1\nGoogle Play Services Location (Android) — Apache 2.0 (conservar NOTICE)\nIonicons / Expo Vector Icons — MIT\nTonos incluidos (alarm.wav, gentle.wav, urgent.wav) — originales de Arrivo; puedes sustituirlos por un archivo del dispositivo",
   },
   empty: {
     title: "Ninguna alarma aún",
@@ -228,6 +257,8 @@ export const es: Messages = {
     deleteAlarm: "Eliminar {{title}}",
     clearSearch: "Borrar búsqueda",
     searchPlaces: "Buscar lugares",
+    submitSearch: "Buscar esta dirección",
+    osmAttribution: "Crédito de OpenStreetMap, abre la licencia",
     centerOnMe: "Centrar en mi ubicación",
     selectZoneColor: "Color {{color}}",
     selectIcon: "Icono {{icon}}",

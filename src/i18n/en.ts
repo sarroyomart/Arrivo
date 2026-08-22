@@ -11,6 +11,8 @@ export const en: Messages = {
     mapPicker: "Choose location",
     ringing: "Alarm",
     onboarding: "Information",
+    privacy: "Privacy",
+    licenses: "Licenses",
   },
   screens: {
     home: {
@@ -33,6 +35,8 @@ export const en: Messages = {
     mapPicker: {
       title: "Choose location",
       searchPlaceholder: "Street and number, or a place",
+      searchHint: "Type the address, then tap search. The query is sent to OpenStreetMap Nominatim.",
+      searchAction: "Search",
       confirm: "Confirm location",
       hint: "Tap the map to drop the pin.",
       locating: "Centering on your location…",
@@ -48,17 +52,19 @@ export const en: Messages = {
     onboarding: {
       title: "Essential setup so your alarms can work",
       subtitle: "{{count}} permissions, in this order. Here's why each one is needed.",
-      privacyTitle: "Location only during trips, 100% local",
+      privacyTitle: "Location on this device; map and search use the network",
       privacy:
-        "The app reads your location while you use it. If an alarm is on and you send the app to the background, a persistent notification (“Arrivo active”) keeps watching your destination. Close the app or turn off every alarm and tracking plus the notification stop. There is no permanent tracking or history, and coordinates are never sent to external servers.",
+        "Alarms and trip GPS are processed on this phone. There is no account or history on our servers (we have no backend). If you search for an address, the query and an approximate area go to Nominatim (OpenStreetMap). The map loads tiles from OpenFreeMap (Cloudflare). If an alarm is on and you send the app to the background, you’ll see the “Arrivo active” notification. Close the app or turn off every alarm and tracking stops.",
       skipTitle: "Continue without every permission?",
       skipBody:
         "Without location or notifications, the alarm may not ring. On Android you do not need “Allow all the time”: with an active alarm and the app in the background you will see a tracking notification. You can turn permissions on later in Settings.",
+      openPrivacy: "Privacy policy",
+      openLicenses: "Open-source licenses",
     },
     guide: {
       title: "How to use Arrivo",
       subtitle:
-        "We'll ping you when you arrive at or leave a saved place. Location stays on this device.",
+        "We'll ping you when you arrive at or leave a saved place. Alarm GPS stays on this device; searching addresses and viewing the map uses the internet.",
       createTitle: "Create a destination",
       createBody:
         "Tap + in the list. Give it a name, pick the point on the map, then set the radius, color, icon, and how it should sound.",
@@ -79,7 +85,7 @@ export const en: Messages = {
   permissions: {
     locationWhenInUse: {
       title: "Location while in use",
-      body: "Used to search places and see your position while the app is open. Choose “Allow only while using the app”. Coordinates stay on this device: they are not sent to any server.",
+      body: "Used to search places and see your position while the app is open. Choose “Allow only while using the app”. Alarms stay on this device. If you search for an address, Nominatim (OpenStreetMap) receives the query and an approximate area; the map loads OpenFreeMap tiles.",
       footnote:
         "If an alarm is on and you send the app to the background (screen off or another app), you will see the persistent “Arrivo active / Watching your destination alarms” notification. We never ask for the invasive “Allow all the time” permission. Close the app or turn off every alarm and the notification disappears immediately.",
     },
@@ -87,7 +93,7 @@ export const en: Messages = {
       title: "Background location during trips",
       body: "With alarms on, the app can read your location with the screen off or the app minimized, only to detect that trip's geofence. There is no permanent tracking or history.",
       footnote:
-        "100% local and offline: we don't send coordinates to external servers. The iOS/Android “always” permission is what enables background use during the trip, not continuous tracking.",
+        "The iOS “always” permission is what enables background use during the trip, not continuous tracking. We don't send trip GPS to our server (there isn't one). Searching for an address or loading the map does use third-party services, as explained in the privacy policy.",
     },
     notifications: {
       title: "High-priority notifications",
@@ -127,6 +133,29 @@ export const en: Messages = {
     edit: "Edit",
     distance: "{{distance}} away",
     unknown_distance: "Calculating distance…",
+  },
+  legal: {
+    privacyUpdated: "Last updated: 22 August 2026.",
+    localTitle: "What stays on the phone",
+    localBody:
+      "Alarm titles, destination coordinates, radii, custom sounds, and language are stored only on this device (AsyncStorage and local files). There is no account, sign-in, or first-party analytics. Trip GPS is used by the Android foreground service or iOS geofences to decide whether you crossed a zone; we do not upload it to a server of ours.",
+    networkTitle: "What goes to the internet",
+    networkBody:
+      "If you tap Search on the map, the address text and an approximate bounding box (when GPS is available) are sent to Nominatim, OpenStreetMap Foundation’s public geocoder. Tapping the map may reverse-geocode the point with Nominatim. Showing the map downloads vector tiles from OpenFreeMap, which may use Cloudflare: that reveals the area you are viewing, not a trip history.",
+    audioTitle: "Audio",
+    audioBody:
+      "You can pick an audio file from this device as a tone. It is copied into the app folder and is not uploaded.",
+    thirdPartiesTitle: "Third parties",
+    thirdPartiesBody:
+      "OpenStreetMap Foundation (Nominatim, United Kingdom), Hyperknot Software Kft. / OpenFreeMap (Hungary), and Cloudflare (tile delivery). Android may use Google Play Services for fused location on-device. This version does not use AdMob or the advertising ID.",
+    rightsTitle: "Your choices",
+    rightsBody:
+      "You can delete alarms in the app or uninstall Arrivo to remove local data. There is no cloud profile to request. The map shows “© OpenStreetMap contributors”; map data is licensed under ODbL.",
+    openInBrowser: "Open full policy",
+    licensesIntro:
+      "Arrivo includes open-source software. These are the main licenses for the binary and map data.",
+    licensesList:
+      "Expo SDK, React Native, and related libraries — MIT / Apache 2.0\nMapLibre React Native — MIT\nOpenStreetMap (map data and Nominatim) — ODbL\nOpenFreeMap / tiles — project MIT; OSM data under ODbL\nInter (typeface) — SIL Open Font License 1.1\nGoogle Play Services Location (Android) — Apache 2.0 (keep NOTICE)\nIonicons / Expo Vector Icons — MIT\nBundled tones (alarm.wav, gentle.wav, urgent.wav) — original Arrivo assets; you can replace them with a file from this device",
   },
   empty: {
     title: "No alarms yet",
@@ -228,6 +257,8 @@ export const en: Messages = {
     deleteAlarm: "Delete {{title}}",
     clearSearch: "Clear search",
     searchPlaces: "Search places",
+    submitSearch: "Search this address",
+    osmAttribution: "OpenStreetMap credit, opens the license",
     centerOnMe: "Center on my location",
     selectZoneColor: "Color {{color}}",
     selectIcon: "Icon {{icon}}",

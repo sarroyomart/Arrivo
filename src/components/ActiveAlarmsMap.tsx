@@ -16,10 +16,10 @@ import { AlarmIcon } from "@/src/components/AlarmIcon";
 import { AlarmMapMarker } from "@/src/components/AlarmMapMarker";
 import { Button } from "@/src/components/Button";
 import { GeofenceLayer } from "@/src/components/GeofenceLayer";
+import { OsmAttribution } from "@/src/components/OsmAttribution";
 import { OsmMap } from "@/src/components/OsmMap";
 import {
   DEFAULT_COORDINATE,
-  OSM_ATTRIBUTION,
   zoomForRadius,
   type MapCoordinate,
 } from "@/src/constants";
@@ -364,13 +364,10 @@ export function ActiveAlarmsMap({ alarms }: ActiveAlarmsMapProps) {
         </View>
       ) : null}
 
-      <Text
-        pointerEvents="none"
-        className="typo-caption absolute left-space-2"
+      <OsmAttribution
+        className="absolute left-space-2"
         style={{ bottom: selected ? sheetOffset + 108 : 8 }}
-      >
-        {OSM_ATTRIBUTION}
-      </Text>
+      />
     </View>
   );
 }

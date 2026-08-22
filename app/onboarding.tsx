@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "@/src/components/Button";
@@ -248,6 +248,34 @@ export default function OnboardingScreen() {
               {t("screens.onboarding.subtitle", { count: permissionCount })}
             </Text>
 
+            <View className="mt-space-6 flex-row gap-space-3 rounded-card border border-border bg-card p-space-4">
+              <View className="h-10 w-10 items-center justify-center rounded-pill bg-primary-container">
+                <Ionicons name="lock-closed-outline" size={20} color={palette.primary} />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="typo-body-medium">{t("screens.onboarding.privacyTitle")}</Text>
+                <Text className="typo-caption mt-space-1">{t("screens.onboarding.privacy")}</Text>
+                <Pressable
+                  accessibilityRole="link"
+                  onPress={() => router.push("/privacy" as Href)}
+                  className="mt-space-2 min-h-touch justify-center"
+                >
+                  <Text className="typo-caption text-primary">
+                    {t("screens.onboarding.openPrivacy")}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="link"
+                  onPress={() => router.push("/licenses" as Href)}
+                  className="min-h-touch justify-center"
+                >
+                  <Text className="typo-caption text-primary">
+                    {t("screens.onboarding.openLicenses")}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
             <View className="mt-space-6 gap-space-4">
               <PermissionStep
                 step={1}
@@ -343,16 +371,6 @@ export default function OnboardingScreen() {
                   }}
                 />
               ) : null}
-            </View>
-
-            <View className="mt-space-6 flex-row gap-space-3 rounded-card border border-border bg-card p-space-4">
-              <View className="h-10 w-10 items-center justify-center rounded-pill bg-primary-container">
-                <Ionicons name="lock-closed-outline" size={20} color={palette.primary} />
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="typo-body-medium">{t("screens.onboarding.privacyTitle")}</Text>
-                <Text className="typo-caption mt-space-1">{t("screens.onboarding.privacy")}</Text>
-              </View>
             </View>
           </ScrollView>
 

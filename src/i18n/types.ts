@@ -11,6 +11,8 @@ export type Messages = {
     mapPicker: string;
     ringing: string;
     onboarding: string;
+    privacy: string;
+    licenses: string;
   };
   screens: {
     home: {
@@ -33,6 +35,8 @@ export type Messages = {
     mapPicker: {
       title: string;
       searchPlaceholder: string;
+      searchHint: string;
+      searchAction: string;
       confirm: string;
       hint: string;
       locating: string;
@@ -52,6 +56,8 @@ export type Messages = {
       privacy: string;
       skipTitle: string;
       skipBody: string;
+      openPrivacy: string;
+      openLicenses: string;
     };
     guide: {
       title: string;
@@ -117,6 +123,22 @@ export type Messages = {
     edit: string;
     distance: string;
     unknown_distance: string;
+  };
+  legal: {
+    privacyUpdated: string;
+    localTitle: string;
+    localBody: string;
+    networkTitle: string;
+    networkBody: string;
+    audioTitle: string;
+    audioBody: string;
+    thirdPartiesTitle: string;
+    thirdPartiesBody: string;
+    rightsTitle: string;
+    rightsBody: string;
+    openInBrowser: string;
+    licensesIntro: string;
+    licensesList: string;
   };
   empty: {
     title: string;
@@ -218,6 +240,8 @@ export type Messages = {
     deleteAlarm: string;
     clearSearch: string;
     searchPlaces: string;
+    submitSearch: string;
+    osmAttribution: string;
     centerOnMe: string;
     selectZoneColor: string;
     selectIcon: string;

@@ -26,14 +26,21 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.arrivo.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Arrivo uses your location only while the app is open, so you can place alarms on the map. Location stays on this device and is not sent to external servers.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
-        "NSLocationAlwaysUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+        "NSLocationWhenInUseUsageDescription": "Arrivo uses your location while the app is open to place alarms and show your position. Alarm GPS stays on this device. Address search and map tiles contact OpenStreetMap Nominatim and OpenFreeMap.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking. Address search and map tiles still use OpenStreetMap / OpenFreeMap when you use the map.",
+        "NSLocationAlwaysUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking. Address search and map tiles still use OpenStreetMap / OpenFreeMap when you use the map.",
         "UIBackgroundModes": ["location", "audio", "fetch"]
       }
     },
     "android": {
       "package": "com.arrivo.app",
+      "versionCode": 1,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.ACCESS_NOTIFICATION_POLICY",
+        "com.google.android.gms.permission.AD_ID"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#FAFAFA",
         "foregroundImage": "./assets/icon-light.png",
@@ -49,8 +56,7 @@
         "POST_NOTIFICATIONS",
         "android.permission.VIBRATE",
         "android.permission.WAKE_LOCK",
-        "android.permission.USE_FULL_SCREEN_INTENT",
-        "android.permission.ACCESS_NOTIFICATION_POLICY"
+        "android.permission.USE_FULL_SCREEN_INTENT"
       ]
     },
     "plugins": [
@@ -58,9 +64,9 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Arrivo uses your location only while the app is open, so you can place alarms on the map. Location stays on this device and is not sent to external servers.",
-          "locationAlwaysAndWhenInUsePermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
-          "locationAlwaysPermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+          "locationWhenInUsePermission": "Arrivo uses your location while the app is open to place alarms and show your position. Alarm GPS stays on this device. Address search and map tiles contact OpenStreetMap Nominatim and OpenFreeMap.",
+          "locationAlwaysAndWhenInUsePermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking. Address search and map tiles still use OpenStreetMap / OpenFreeMap when you use the map.",
+          "locationAlwaysPermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking. Address search and map tiles still use OpenStreetMap / OpenFreeMap when you use the map.",
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": true
@@ -84,6 +90,7 @@
         "expo-audio",
         {
           "microphonePermission": false,
+          "recordAudioAndroid": false,
           "enableBackgroundPlayback": true
         }
       ],

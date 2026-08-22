@@ -8,8 +8,8 @@ export const OSM_STYLE_URL = {
   dark: "https://tiles.openfreemap.org/styles/dark",
 } as const;
 
-/** Attribution shown over MapLibre canvases. */
-export const OSM_ATTRIBUTION = "© OpenStreetMap";
+/** Attribution shown over MapLibre canvases (ODbL). */
+export const OSM_ATTRIBUTION = "© OpenStreetMap contributors";
 
 /** MapLibre Camera uses [longitude, latitude]. */
 export const DEFAULT_MAP_CENTER: [number, number] = [-3.7038, 40.4168];

@@ -17,12 +17,12 @@ import { Button } from "@/src/components/Button";
 import { GeofenceLayer } from "@/src/components/GeofenceLayer";
 import { IconButton } from "@/src/components/IconButton";
 import { LocationSearchBar } from "@/src/components/LocationSearchBar";
+import { OsmAttribution } from "@/src/components/OsmAttribution";
 import { OsmMap } from "@/src/components/OsmMap";
 import {
   DEFAULT_COORDINATE,
   DEFAULT_ZONE_COLOR,
   isValidCoordinate,
-  OSM_ATTRIBUTION,
   RADIUS_DEFAULT_METERS,
   zoomForRadius,
   type MapCoordinate,
@@ -387,7 +387,7 @@ export default function MapPickerScreen() {
         <Button disabled={!picked} onPress={confirm}>
           {t("screens.mapPicker.confirm")}
         </Button>
-        <Text className="typo-caption mt-space-2 text-center">{OSM_ATTRIBUTION}</Text>
+        <OsmAttribution className="mt-space-2 self-center" />
       </View>
     </View>
   );

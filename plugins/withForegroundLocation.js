@@ -48,6 +48,12 @@ const withForegroundLocationManifest = (config) => {
     );
     blockBackgroundLocation(config.modResults);
 
+    const application = AndroidConfig.Manifest.getMainApplicationOrThrow(
+      config.modResults,
+    );
+    application.$ = application.$ ?? {};
+    application.$["android:allowBackup"] = "false";
+
     const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(
       config.modResults,
     );
