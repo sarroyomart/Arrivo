@@ -25,7 +25,11 @@ export async function syncActiveRegions(): Promise<void> {
   }
 
   if (Platform.OS === "android") {
-    await reconcileLocationForeground();
+    try {
+      await reconcileLocationForeground();
+    } catch (error) {
+      console.warn("[Arrivo] Failed to sync geofence regions", error);
+    }
     return;
   }
 

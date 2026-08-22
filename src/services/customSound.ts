@@ -50,13 +50,18 @@ export async function persistCustomSound(
     return { uri: sourceUri, name: displayName };
   }
 
-  const dir = `${root}${CUSTOM_SOUND_DIR}/`;
-  const info = await FileSystem.getInfoAsync(dir);
-  if (!info.exists) {
-    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
-  }
+  try {
+    const dir = `${root}${CUSTOM_SOUND_DIR}/`;
+    const info = await FileSystem.getInfoAsync(dir);
+    if (!info.exists) {
+      await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+    }
 
-  const destination = `${dir}${createId()}${ext}`;
-  await FileSystem.copyAsync({ from: sourceUri, to: destination });
-  return { uri: destination, name: displayName };
+    const destination = `${dir}${createId()}${ext}`;
+    await FileSystem.copyAsync({ from: sourceUri, to: destination });
+    return { uri: destination, name: displayName };
+  } catch (error) {
+    console.warn("[Arrivo] Failed to persist custom sound", error);
+    return { uri: sourceUri, name: displayName };
+  }
 }

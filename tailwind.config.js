@@ -74,12 +74,12 @@ module.exports = {
         },
         // Closed radius / zone palette (6 swatches)
         zone: {
-          orange: "#EA580C",
-          teal: "#14B8A6",
-          blue: "#3B82F6",
-          violet: "#8B5CF6",
-          rose: "#F43F5E",
-          slate: "#64748B",
+          orange: "var(--color-zone-orange)",
+          teal: "var(--color-zone-teal)",
+          blue: "var(--color-zone-blue)",
+          violet: "var(--color-zone-violet)",
+          rose: "var(--color-zone-rose)",
+          slate: "var(--color-zone-slate)",
         },
       },
       fontFamily: {

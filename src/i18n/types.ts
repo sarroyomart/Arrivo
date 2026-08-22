@@ -1,6 +1,9 @@
 export type Locale = "es" | "en";
 
 export type Messages = {
+  app: {
+    name: string;
+  };
   nav: {
     home: string;
     newAlarm: string;

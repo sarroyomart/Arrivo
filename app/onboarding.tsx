@@ -178,7 +178,7 @@ export default function OnboardingScreen() {
               onPress={() => router.back()}
             />
           ) : null}
-          <Text className="typo-h2">Arrivo</Text>
+          <Text className="typo-h2">{t("app.name")}</Text>
         </View>
         <LanguageToggle />
       </View>

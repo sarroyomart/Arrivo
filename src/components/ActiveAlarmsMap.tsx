@@ -261,7 +261,7 @@ export function ActiveAlarmsMap({ alarms }: ActiveAlarmsMapProps) {
       longitude: selected.longitude,
     });
     return t("map.distance", {
-      distance: formatDistanceMeters(meters, locale),
+      distance: formatDistanceMeters(meters, t, locale),
     });
   }, [locale, selected, t, userCoord]);
 

@@ -21,6 +21,7 @@ export const STORAGE_KEYS = {
   alarms: "@arrivo_alarms",
   ringingAlarmId: "@arrivo_ringingAlarmId",
   onboardingCompleted: "@arrivo_onboarding_completed",
+  locale: "@arrivo_locale",
 } as const;
 
 export const ANDROID_ALARM_CHANNEL_ID = "arrivo_alarm_channel_v2";

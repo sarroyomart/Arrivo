@@ -156,3 +156,20 @@ export async function setOnboardingCompleted(completed: boolean): Promise<void> 
     // Keep the flow usable even if the flag fails to persist.
   }
 }
+
+export async function getPreferredLocale(): Promise<"es" | "en" | null> {
+  try {
+    const value = await AsyncStorage.getItem(STORAGE_KEYS.locale);
+    return value === "es" || value === "en" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setPreferredLocale(locale: "es" | "en"): Promise<void> {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.locale, locale);
+  } catch {
+    // Keep the language toggle usable even if the preference fails to persist.
+  }
+}

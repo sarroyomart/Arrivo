@@ -66,13 +66,21 @@ export function LocationSearchBar({
         language: locale,
         userLat: proximity?.latitude,
         userLon: proximity?.longitude,
-      }).then((places) => {
-        if (requestId.current !== currentId) {
-          return;
-        }
-        setSuggestions(places);
-        setLoading(false);
-      });
+      })
+        .then((places) => {
+          if (requestId.current !== currentId) {
+            return;
+          }
+          setSuggestions(places);
+          setLoading(false);
+        })
+        .catch(() => {
+          if (requestId.current !== currentId) {
+            return;
+          }
+          setSuggestions([]);
+          setLoading(false);
+        });
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {

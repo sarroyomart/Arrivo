@@ -703,49 +703,55 @@ export async function searchPlaces(
   query: string,
   options: SearchPlacesOptions,
 ): Promise<NominatimPlace[]> {
-  const trimmed = query.trim();
-  if (trimmed.length < 2) {
+  try {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      return [];
+    }
+
+    const language = nominatimLanguage(options.language);
+    const proximity = resolveUserCoordinate(options);
+    const parsed = parseAddressQuery(trimmed);
+    const withGeometry = parsed !== null;
+
+    const run = (mode: "structured" | "freeform"): Promise<RankedPlace[]> => {
+      const params = baseSearchParams(language, proximity, withGeometry);
+      if (mode === "structured" && parsed) {
+        params.set("street", `${parsed.housenumber} ${parsed.street}`);
+        if (parsed.city) {
+          params.set("city", parsed.city);
+        }
+      } else {
+        const q = parsed
+          ? `${parsed.housenumber} ${parsed.street}${parsed.city ? `, ${parsed.city}` : ""}`
+          : trimmed;
+        params.set("q", q);
+      }
+      return requestPlaces(params, language, parsed, proximity);
+    };
+
+    if (!parsed) {
+      return (await run("freeform")).map(publicPlace);
+    }
+
+    const structured = await run("structured");
+    if (hasExactLocalHouse(structured, parsed)) {
+      return structured.map(publicPlace);
+    }
+
+    // OSM often has the street but not the portal. Keep the local street and
+    // pin the requested number on it — never promote "24" from another city.
+    if (structured.length > 0) {
+      return attachHouseIfMissing(structured, parsed).map(publicPlace);
+    }
+
+    const freeform = await run("freeform");
+    return attachHouseIfMissing(mergePlaces([structured, freeform]), parsed).map(
+      publicPlace,
+    );
+  } catch {
     return [];
   }
-
-  const language = nominatimLanguage(options.language);
-  const proximity = resolveUserCoordinate(options);
-  const parsed = parseAddressQuery(trimmed);
-  const withGeometry = parsed !== null;
-
-  const run = (mode: "structured" | "freeform"): Promise<RankedPlace[]> => {
-    const params = baseSearchParams(language, proximity, withGeometry);
-    if (mode === "structured" && parsed) {
-      params.set("street", `${parsed.housenumber} ${parsed.street}`);
-      if (parsed.city) {
-        params.set("city", parsed.city);
-      }
-    } else {
-      const q = parsed
-        ? `${parsed.housenumber} ${parsed.street}${parsed.city ? `, ${parsed.city}` : ""}`
-        : trimmed;
-      params.set("q", q);
-    }
-    return requestPlaces(params, language, parsed, proximity);
-  };
-
-  if (!parsed) {
-    return (await run("freeform")).map(publicPlace);
-  }
-
-  const structured = await run("structured");
-  if (hasExactLocalHouse(structured, parsed)) {
-    return structured.map(publicPlace);
-  }
-
-  // OSM often has the street but not the portal. Keep the local street and
-  // pin the requested number on it — never promote "24" from another city.
-  if (structured.length > 0) {
-    return attachHouseIfMissing(structured, parsed).map(publicPlace);
-  }
-
-  const freeform = await run("freeform");
-  return attachHouseIfMissing(mergePlaces([structured, freeform]), parsed).map(publicPlace);
 }
 
 export async function reverseGeocode(

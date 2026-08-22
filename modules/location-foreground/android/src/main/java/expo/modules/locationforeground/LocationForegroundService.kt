@@ -37,6 +37,8 @@ import org.json.JSONObject
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class LocationForegroundService : Service() {
@@ -58,6 +60,10 @@ class LocationForegroundService : Service() {
   private var localeTag = "en"
   private var lastPublishedTitle = ""
   private var lastPublishedBody = ""
+  private var lastNotifiedDistance: Float? = null
+  private var lastNotifiedInside: Boolean? = null
+  private var lastNotifiedAlarmId: String? = null
+  private var currentSampling: LocationSampling? = null
 
   private val fusedCallback = object : LocationCallback() {
     override fun onLocationResult(result: LocationResult) {
@@ -116,6 +122,12 @@ class LocationForegroundService : Service() {
     alarms = parsed
     insideIds.retainAll(parsed.map { it.id }.toSet())
     firedIds.retainAll(parsed.map { it.id }.toSet())
+    lastNotifiedDistance = null
+    lastNotifiedInside = null
+    lastNotifiedAlarmId = null
+    lastPublishedTitle = ""
+    lastPublishedBody = ""
+    currentSampling = null
 
     try {
       startAsForeground()
@@ -178,20 +190,17 @@ class LocationForegroundService : Service() {
   @SuppressLint("MissingPermission")
   private fun startLocationUpdates() {
     stopLocationUpdates()
+    currentSampling = null
     if (!hasLocationPermission()) {
       shutdown()
       return
     }
 
+    val initial = samplingFor(initialRemainingMeters(), current = null)
     val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
     if (playServices == ConnectionResult.SUCCESS) {
-      val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, UPDATE_INTERVAL_MS)
-        .setMinUpdateIntervalMillis(MIN_UPDATE_INTERVAL_MS)
-        .setMinUpdateDistanceMeters(MIN_DISPLACEMENT_METERS)
-        .setWaitForAccurateLocation(false)
-        .build()
       try {
-        fusedClient.requestLocationUpdates(request, fusedCallback, Looper.getMainLooper())
+        requestFusedUpdates(initial)
         usingFused = true
         fusedClient.lastLocation.addOnSuccessListener { location ->
           if (location != null) {
@@ -208,10 +217,22 @@ class LocationForegroundService : Service() {
       }
     }
 
-    startLegacyLocationUpdates()
+    startLegacyLocationUpdates(initial)
   }
 
-  private fun startLegacyLocationUpdates() {
+  @SuppressLint("MissingPermission")
+  private fun requestFusedUpdates(sampling: LocationSampling) {
+    val request = LocationRequest.Builder(sampling.priority, sampling.intervalMs)
+      .setMinUpdateIntervalMillis(sampling.minIntervalMs)
+      .setMinUpdateDistanceMeters(sampling.minDistanceMeters)
+      .setWaitForAccurateLocation(false)
+      .build()
+    fusedClient.requestLocationUpdates(request, fusedCallback, Looper.getMainLooper())
+    currentSampling = sampling
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun startLegacyLocationUpdates(sampling: LocationSampling) {
     val manager = getSystemService(LOCATION_SERVICE) as? LocationManager ?: run {
       shutdown()
       return
@@ -230,17 +251,64 @@ class LocationForegroundService : Service() {
       for (provider in providers) {
         manager.requestLocationUpdates(
           provider,
-          UPDATE_INTERVAL_MS,
-          MIN_DISPLACEMENT_METERS,
+          sampling.intervalMs,
+          sampling.minDistanceMeters,
           managerListener,
           Looper.getMainLooper(),
         )
         manager.getLastKnownLocation(provider)?.let(::onLocation)
       }
+      currentSampling = sampling
     } catch (error: SecurityException) {
       Log.w(LocationForegroundBridge.TAG, "LocationManager permission denied", error)
       shutdown()
     }
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun adaptLocationSampling(remainingMeters: Float) {
+    if (!hasLocationPermission()) {
+      return
+    }
+    val next = samplingFor(remainingMeters, currentSampling)
+    if (next == currentSampling) {
+      return
+    }
+    try {
+      if (usingFused) {
+        requestFusedUpdates(next)
+        return
+      }
+      locationManager?.let { manager ->
+        try {
+          manager.removeUpdates(managerListener)
+        } catch (_: Exception) {
+        }
+        val providers = listOf(
+          LocationManager.GPS_PROVIDER,
+          LocationManager.NETWORK_PROVIDER,
+        ).filter { manager.isProviderEnabled(it) }
+        for (provider in providers) {
+          manager.requestLocationUpdates(
+            provider,
+            next.intervalMs,
+            next.minDistanceMeters,
+            managerListener,
+            Looper.getMainLooper(),
+          )
+        }
+        currentSampling = next
+      }
+    } catch (error: SecurityException) {
+      Log.w(LocationForegroundBridge.TAG, "Unable to adapt location sampling", error)
+    } catch (error: Exception) {
+      Log.w(LocationForegroundBridge.TAG, "Unable to adapt location sampling", error)
+    }
+  }
+
+  private fun initialRemainingMeters(): Float {
+    val location = lastKnownLocation ?: return SAMPLING_NEAR_METERS
+    return findNearestAlarm(location)?.remainingMeters ?: SAMPLING_NEAR_METERS
   }
 
   private fun stopLocationUpdates() {
@@ -256,6 +324,7 @@ class LocationForegroundService : Service() {
     }
     locationManager = null
     usingFused = false
+    currentSampling = null
   }
 
   private fun onLocation(location: Location) {
@@ -300,7 +369,36 @@ class LocationForegroundService : Service() {
     insideIds.clear()
     insideIds.addAll(nextInside)
     seeded = true
-    publishOngoingDistance(location)
+
+    val nearest = findNearestAlarm(location) ?: return
+    adaptLocationSampling(nearest.remainingMeters)
+    if (shouldRefreshNotification(nearest)) {
+      publishOngoingDistance(nearest)
+    }
+  }
+
+  private fun notificationRefreshThreshold(remainingMeters: Float): Float {
+    val remaining = if (remainingMeters.isFinite() && remainingMeters > 0f) {
+      remainingMeters
+    } else {
+      0f
+    }
+    return max(NOTIFICATION_MIN_REFRESH_METERS, remaining * NOTIFICATION_REFRESH_FRACTION)
+  }
+
+  private fun shouldRefreshNotification(nearest: NearestOngoing): Boolean {
+    val lastDistance = lastNotifiedDistance ?: return true
+    if (lastNotifiedAlarmId != nearest.alarmId) {
+      return true
+    }
+    if (lastNotifiedInside != nearest.inside) {
+      return true
+    }
+    if (nearest.inside) {
+      return false
+    }
+    return abs(nearest.remainingMeters - lastDistance) >=
+      notificationRefreshThreshold(nearest.remainingMeters)
   }
 
   private fun fireAlarm(alarm: TrackedAlarm) {
@@ -383,23 +481,29 @@ class LocationForegroundService : Service() {
 
   private fun currentOngoingNotification(): Notification {
     val location = lastKnownLocation
-    val (title, body) = if (location != null && alarms.isNotEmpty()) {
-      composeOngoingText(location)
+    val nearest = if (location != null && alarms.isNotEmpty()) {
+      findNearestAlarm(location)
+    } else {
+      null
+    }
+    val (title, body) = if (nearest != null) {
+      composeOngoingText(nearest)
     } else {
       ongoingTitle to ongoingBody
     }
-    lastPublishedTitle = title
-    lastPublishedBody = body
+    rememberPublishedNotification(title, body, nearest)
     return buildOngoingNotification(title, body)
   }
 
-  private fun publishOngoingDistance(location: Location) {
-    val (title, body) = composeOngoingText(location)
+  private fun publishOngoingDistance(nearest: NearestOngoing) {
+    val (title, body) = composeOngoingText(nearest)
     if (title == lastPublishedTitle && body == lastPublishedBody) {
+      if (lastNotifiedDistance == null) {
+        rememberPublishedNotification(title, body, nearest)
+      }
       return
     }
-    lastPublishedTitle = title
-    lastPublishedBody = body
+    rememberPublishedNotification(title, body, nearest)
     try {
       NotificationManagerCompat.from(this).notify(
         NOTIFICATION_ID,
@@ -410,8 +514,22 @@ class LocationForegroundService : Service() {
     }
   }
 
-  private fun composeOngoingText(location: Location): Pair<String, String> {
-    val nearest = findNearestAlarm(location) ?: return ongoingTitle to ongoingBody
+  private fun rememberPublishedNotification(
+    title: String,
+    body: String,
+    nearest: NearestOngoing?,
+  ) {
+    lastPublishedTitle = title
+    lastPublishedBody = body
+    if (nearest == null) {
+      return
+    }
+    lastNotifiedDistance = nearest.remainingMeters
+    lastNotifiedInside = nearest.inside
+    lastNotifiedAlarmId = nearest.alarmId
+  }
+
+  private fun composeOngoingText(nearest: NearestOngoing): Pair<String, String> {
     val title = if (nearest.inside) {
       applyTemplate(insideTemplate, mapOf("title" to nearest.title))
     } else {
@@ -474,23 +592,15 @@ class LocationForegroundService : Service() {
 
     val alarm = nearest ?: return null
     val label = alarm.title.ifBlank { ongoingTitle }
+    val remaining = if (nearestDistance.isFinite()) nearestDistance else 0f
     return NearestOngoing(
+      alarmId = alarm.id,
       title = label,
-      displayMeters = bucketMeters(nearestDistance),
-      inside = nearestDistance <= alarm.radius,
+      remainingMeters = remaining,
+      displayMeters = remaining.roundToInt().coerceAtLeast(0),
+      inside = remaining <= alarm.radius,
       extraCount = (alarms.size - 1).coerceAtLeast(0),
     )
-  }
-
-  private fun bucketMeters(meters: Float): Int {
-    if (!meters.isFinite() || meters <= 0f) {
-      return 0
-    }
-    if (meters < NOTIFICATION_DISTANCE_BUCKET_METERS) {
-      return meters.roundToInt().coerceAtLeast(1)
-    }
-    return (meters / NOTIFICATION_DISTANCE_BUCKET_METERS).roundToInt() *
-      NOTIFICATION_DISTANCE_BUCKET_METERS
   }
 
   private fun formatDistanceLabel(meters: Int): String {
@@ -673,11 +783,75 @@ class LocationForegroundService : Service() {
     } catch (_: Exception) {
     }
     isRunning.set(false)
+    lastNotifiedDistance = null
+    lastNotifiedInside = null
+    lastNotifiedAlarmId = null
     stopSelf()
   }
 
+  private fun samplingFor(remainingMeters: Float, current: LocationSampling?): LocationSampling {
+    val meters = if (remainingMeters.isFinite() && remainingMeters > 0f) remainingMeters else 0f
+    val far = LocationSampling(
+      intervalMs = 40_000L,
+      minIntervalMs = 20_000L,
+      minDistanceMeters = 120f,
+      priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+    )
+    val mid = LocationSampling(
+      intervalMs = 15_000L,
+      minIntervalMs = 8_000L,
+      minDistanceMeters = 50f,
+      priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+    )
+    val near = LocationSampling(
+      intervalMs = 6_000L,
+      minIntervalMs = 3_000L,
+      minDistanceMeters = 20f,
+      priority = Priority.PRIORITY_HIGH_ACCURACY,
+    )
+    val close = LocationSampling(
+      intervalMs = 2_000L,
+      minIntervalMs = 1_000L,
+      minDistanceMeters = 8f,
+      priority = Priority.PRIORITY_HIGH_ACCURACY,
+    )
+
+    if (current == null) {
+      return when {
+        meters >= SAMPLING_FAR_METERS -> far
+        meters >= SAMPLING_MID_METERS -> mid
+        meters >= SAMPLING_NEAR_METERS -> near
+        else -> close
+      }
+    }
+
+    return when (current.intervalMs) {
+      far.intervalMs -> if (meters < 4_000f) mid else far
+      mid.intervalMs -> when {
+        meters >= 6_000f -> far
+        meters < 900f -> near
+        else -> mid
+      }
+      near.intervalMs -> when {
+        meters >= 1_500f -> mid
+        meters < 220f -> close
+        else -> near
+      }
+      else -> if (meters >= 350f) near else close
+    }
+  }
+
+  private data class LocationSampling(
+    val intervalMs: Long,
+    val minIntervalMs: Long,
+    val minDistanceMeters: Float,
+    val priority: Int,
+  )
+
   private data class NearestOngoing(
+    val alarmId: String,
     val title: String,
+    val remainingMeters: Float,
     val displayMeters: Int,
     val inside: Boolean,
     val extraCount: Int,
@@ -703,10 +877,11 @@ class LocationForegroundService : Service() {
     const val DEFAULT_INSIDE_TEMPLATE = "En {{title}}"
     const val DEFAULT_MORE_TEMPLATE = "y {{count}} más"
 
-    private const val UPDATE_INTERVAL_MS = 5_000L
-    private const val MIN_UPDATE_INTERVAL_MS = 2_000L
-    private const val MIN_DISPLACEMENT_METERS = 15f
-    private const val NOTIFICATION_DISTANCE_BUCKET_METERS = 25
+    private const val NOTIFICATION_MIN_REFRESH_METERS = 25f
+    private const val NOTIFICATION_REFRESH_FRACTION = 0.10f
+    private const val SAMPLING_FAR_METERS = 5_000f
+    private const val SAMPLING_MID_METERS = 1_200f
+    private const val SAMPLING_NEAR_METERS = 300f
 
     val isRunning = AtomicBoolean(false)
 

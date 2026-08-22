@@ -1,6 +1,9 @@
 import type { Messages } from "./types";
 
 export const es: Messages = {
+  app: {
+    name: "Arrivo",
+  },
   nav: {
     home: "Alarmas",
     newAlarm: "Nueva alarma",

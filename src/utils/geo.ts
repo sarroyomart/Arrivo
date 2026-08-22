@@ -1,4 +1,5 @@
 import type { MapCoordinate } from "@/src/constants/map";
+import type { Locale, Translate } from "@/src/i18n";
 
 const EARTH_RADIUS_METERS = 6_371_000;
 
@@ -18,13 +19,17 @@ export function haversineMeters(from: MapCoordinate, to: MapCoordinate): number 
   return 2 * EARTH_RADIUS_METERS * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
-export function formatDistanceMeters(meters: number, locale: string): string {
+export function formatDistanceMeters(
+  meters: number,
+  t: Translate,
+  locale: Locale,
+): string {
   if (meters < 1000) {
-    return `${Math.round(meters)} m`;
+    return t("alarm.radiusMeters", { meters: Math.round(meters) });
   }
   const km = meters / 1000;
   const value = km.toLocaleString(locale === "es" ? "es-ES" : "en-US", {
     maximumFractionDigits: km >= 10 ? 0 : 1,
   });
-  return `${value} km`;
+  return t("radius.kilometers", { value });
 }

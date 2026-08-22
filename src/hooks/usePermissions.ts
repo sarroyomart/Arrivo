@@ -250,7 +250,11 @@ function usePermissionsController(): PermissionsContextValue {
   }, []);
 
   const openSettings = useCallback(async () => {
-    await Linking.openSettings();
+    try {
+      await Linking.openSettings();
+    } catch {
+      // Settings may be unavailable (web / restricted profiles).
+    }
   }, []);
 
   const completeOnboarding = useCallback(async () => {
