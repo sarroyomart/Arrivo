@@ -5,7 +5,7 @@
 [![iOS](https://img.shields.io/badge/iOS-development%20build-000000?logo=apple)](#2-restricciones-t%C3%A9cnicas-cr%C3%ADticas--development-builds)
 [![Android](https://img.shields.io/badge/Android-development%20build-3DDC84?logo=android&logoColor=white)](#2-restricciones-t%C3%A9cnicas-cr%C3%ADticas--development-builds)
 [![Maps](https://img.shields.io/badge/Maps-OpenStreetMap-7EBC6F?logo=openstreetmap&logoColor=white)](#3-openstreetmap--nominatim)
-[![Offline](https://img.shields.io/badge/MVP-100%25%20offline-EA580C)](#1-descripci%C3%B3n-del-proyecto--arquitectura-de-dise%C3%B1o)
+[![Maps](https://img.shields.io/badge/Geofences-on--device-EA580C)](#1-descripci%C3%B3n-del-proyecto--arquitectura-de-dise%C3%B1o)
 
 Alarmas de lugar para iOS y Android: **cuando entras en el radio de un destino guardado, la app te avisa**. El disparo es local (geocercas del sistema operativo), sin cuenta, sin backend y sin API keys de mapas.
 
@@ -361,6 +361,8 @@ Alineada con [`Docs/plan.md`](Docs/plan.md). Módulos extra respecto al plan (`n
 Arrivo/
 ├── Docs/
 │   ├── plan.md                 # Producto, arquitectura y orden de implementación
+│   ├── privacy-policy.md       # Política pública (URL de Play)
+│   ├── play-console.md         # Textos Data Safety / FGS / FSI
 │   └── EntryPrompt.md
 ├── design/
 │   ├── DESIGN.md               # Penpot: 3 fases, tokens MD3, consumo NativeWind
@@ -372,7 +374,9 @@ Arrivo/
 │   ├── alarm/[id].tsx          # Crear / editar
 │   ├── map-picker.tsx          # Mapa OSM interactivo
 │   ├── ringing.tsx             # Alarma sonando (sin back)
-│   └── onboarding.tsx          # Información: permisos + guía de uso
+│   ├── onboarding.tsx          # Información: permisos + guía de uso
+│   ├── privacy.tsx             # Política de privacidad in-app
+│   └── licenses.tsx            # Licencias OSS + NOTICE Apache
 ├── src/
 │   ├── components/             # Librería 1:1 con Penpot (Button, AlarmCard, …)
 │   ├── hooks/                  # useAlarms, usePermissions, useColorScheme
@@ -389,6 +393,8 @@ Arrivo/
 │   ├── types/alarm.ts          # GeoAlarm
 │   ├── constants/              # Radios, paleta, OSM, nombre de task
 │   └── utils/                  # id, cn, formatRadius
+├── plugins/                    # withForegroundLocation, withAlarmLockScreen, withNotice, …
+├── NOTICE                      # Atribución Apache / OFL (también en el AAB)
 ├── assets/sounds/alarm.wav     # Sonido de alarma (sustituible)
 ├── app.json                    # Plugins, permisos, background modes
 ├── eas.json                    # Perfiles development / preview / production
@@ -406,6 +412,8 @@ La carpeta `android/` (y `ios/` tras `prebuild` en Mac) es **generada**. No es l
 | Ruta | Comportamiento |
 |------|----------------|
 | `/onboarding` | Información: pestaña **Permisos** (ubicación, notificaciones, pantalla completa) y pestaña **Cómo usar**. Copy i18n. |
+| `/privacy` | Política de privacidad in-app (enlace a la copia pública en GitHub). |
+| `/licenses` | Licencias OSS y NOTICE Apache 2.0. |
 | `/` | Lista, switch activo, eliminar, FAB crear. `EmptyState` si no hay alarmas. |
 | `/alarm/[id]` | Título, slider de radio, swatches, `MapPreview`, ir al mapa. `id = new` o uuid. |
 | `/map-picker` | MapLibre (OSM) tap → pin + círculo; búsqueda Nominatim. |

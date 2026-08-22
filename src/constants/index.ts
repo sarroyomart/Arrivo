@@ -32,6 +32,7 @@ export {
 } from "./map";
 export type { MapCoordinate } from "./map";
 export { APP_USER_AGENT, LEGAL_URLS } from "./legal";
+export { NOTICE_TEXT } from "./notice";
 export {
   DEFAULT_ZONE_COLOR,
   GEOFENCE_FILL_OPACITY,

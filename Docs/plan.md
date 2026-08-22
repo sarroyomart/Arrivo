@@ -164,7 +164,7 @@ Plugins y permisos necesarios:
 - `expo-router`, `expo-location`, `expo-notifications`, `expo-task-manager`, `expo-audio`, `expo-localization`, `@maplibre/maplibre-react-native`
 - iOS `infoPlist`: `NSLocationWhenInUseUsageDescription`, `NSLocationAlwaysAndWhenInUseUsageDescription`, `NSLocationAlwaysUsageDescription`, `UIBackgroundModes`: `location`, `audio`, `fetch`
 - `ios.infoPlist.UIBackgroundModes` + `isIosBackgroundLocationEnabled` en el plugin de `expo-location`
-- Android: `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`, `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`
+- Android: `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`. **No** `ACCESS_BACKGROUND_LOCATION` (FGS tipo `location` + notificación «Arrivo activo»).
 - Plugin `@maplibre/maplibre-react-native` (OpenStreetMap / OpenFreeMap; sin Google Maps ni API key)
 
 Límite de plataforma a respetar en código: **máx. 20 geofences activos** (iOS). Si hay más alarmas activas, avisar y no registrar las restantes.

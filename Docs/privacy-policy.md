@@ -19,7 +19,8 @@ Alarm titles, destination coordinates, radii, custom alarm sounds, and language 
 
 ### What is sent over the internet
 
-- **Address search:** if you type a place and tap Search, the query and an approximate map area (when GPS is available) are sent to **Nominatim**, the public geocoder run by the OpenStreetMap Foundation (United Kingdom). Tapping the map may reverse-geocode that point with Nominatim.
+- **Address search:** if you type a place and tap Search, the query and an approximate map area (when GPS is available) are sent to **Nominatim**, the public geocoder run by the OpenStreetMap Foundation (United Kingdom).
+- **Map tap (reverse geocode):** tapping the map sends **that point’s coordinates** to Nominatim so the app can show a place name. This is precise location, only for the point you chose, and only when you tap.
 - **Map display:** vector tiles are loaded from **OpenFreeMap** (Hyperknot Software Kft., Hungary). Delivery may use **Cloudflare**. Tile requests reveal the map area you are viewing, not a stored trip history.
 
 ### Audio
@@ -38,7 +39,8 @@ Map data © OpenStreetMap contributors, licensed under the Open Database License
 
 ### Contact
 
-Project repository: <https://github.com/sarroyomart/Arrivo>
+Project repository: <https://github.com/sarroyomart/Arrivo>  
+Privacy questions: <https://github.com/sarroyomart/Arrivo/issues>
 
 ---
 
@@ -50,7 +52,8 @@ Títulos de alarmas, coordenadas, radios, sonidos personalizados e idioma se gua
 
 ### Qué se envía por Internet
 
-- **Búsqueda de direcciones:** si escribes un lugar y pulsas Buscar, la consulta y un área aproximada (si hay GPS) se envían a **Nominatim** (OpenStreetMap Foundation, Reino Unido). Tocar el mapa puede pedir a Nominatim el nombre del punto.
+- **Búsqueda de direcciones:** si escribes un lugar y pulsas Buscar, la consulta y un área aproximada (si hay GPS) se envían a **Nominatim** (OpenStreetMap Foundation, Reino Unido).
+- **Toque en el mapa (geocodificación inversa):** se envían **las coordenadas de ese punto** a Nominatim para mostrar un nombre. Es ubicación precisa, solo del punto que eliges y solo al tocar.
 - **Mapa:** las teselas vectoriales las sirve **OpenFreeMap** (Hyperknot Software Kft., Hungría). La entrega puede usar **Cloudflare**. Eso revela la zona que estás viendo, no un historial de trayectos.
 
 ### Audio
@@ -69,4 +72,5 @@ Datos del mapa © OpenStreetMap contributors, bajo Open Database License (ODbL).
 
 ### Contacto
 
-Repositorio: <https://github.com/sarroyomart/Arrivo>
+Repositorio: <https://github.com/sarroyomart/Arrivo>  
+Preguntas de privacidad: <https://github.com/sarroyomart/Arrivo/issues>

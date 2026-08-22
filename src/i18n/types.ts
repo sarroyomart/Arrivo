@@ -136,9 +136,13 @@ export type Messages = {
     thirdPartiesBody: string;
     rightsTitle: string;
     rightsBody: string;
+    contactTitle: string;
+    contactBody: string;
     openInBrowser: string;
+    openContact: string;
     licensesIntro: string;
     licensesList: string;
+    licensesNoticeTitle: string;
   };
   empty: {
     title: string;

@@ -11,6 +11,7 @@ const SECTIONS: { title: MessageKey; body: MessageKey }[] = [
   { title: "legal.audioTitle", body: "legal.audioBody" },
   { title: "legal.thirdPartiesTitle", body: "legal.thirdPartiesBody" },
   { title: "legal.rightsTitle", body: "legal.rightsBody" },
+  { title: "legal.contactTitle", body: "legal.contactBody" },
 ];
 
 export default function PrivacyScreen() {
@@ -38,6 +39,15 @@ export default function PrivacyScreen() {
           className="mt-space-6 min-h-touch justify-center"
         >
           <Text className="typo-body-medium text-primary">{t("legal.openInBrowser")}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => {
+            void Linking.openURL(LEGAL_URLS.issues);
+          }}
+          className="min-h-touch justify-center"
+        >
+          <Text className="typo-body-medium text-primary">{t("legal.openContact")}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

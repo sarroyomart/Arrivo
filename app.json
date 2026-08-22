@@ -53,6 +53,7 @@
         "ACCESS_COARSE_LOCATION",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_LOCATION",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "POST_NOTIFICATIONS",
         "android.permission.VIBRATE",
         "android.permission.WAKE_LOCK",
@@ -84,6 +85,7 @@
       ],
       "./plugins/withAlarmLockScreen",
       "./plugins/withForegroundLocation",
+      "./plugins/withNotice",
       "./plugins/withThemedAppIcon",
       "expo-task-manager",
       [
