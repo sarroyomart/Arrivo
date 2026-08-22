@@ -5,18 +5,24 @@
     "scheme": "arrivo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-dark.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icon-light.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000",
+      "backgroundColor": "#FAFAFA",
       "dark": {
+        "image": "./assets/icon-dark.png",
         "backgroundColor": "#000000"
       }
     },
     "ios": {
+      "icon": {
+        "light": "./assets/icon-light.png",
+        "dark": "./assets/icon-dark.png",
+        "tinted": "./assets/android-icon-monochrome.png"
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.arrivo.app",
       "infoPlist": {
@@ -29,8 +35,8 @@
     "android": {
       "package": "com.arrivo.app",
       "adaptiveIcon": {
-        "backgroundColor": "#000000",
-        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#FAFAFA",
+        "foregroundImage": "./assets/icon-light.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
@@ -72,6 +78,7 @@
       ],
       "./plugins/withAlarmLockScreen",
       "./plugins/withForegroundLocation",
+      "./plugins/withThemedAppIcon",
       "expo-task-manager",
       [
         "expo-audio",
