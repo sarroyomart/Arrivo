@@ -2,6 +2,7 @@
 export const LEGAL_URLS = {
   github: "https://github.com/sarroyomart/Arrivo",
   issues: "https://github.com/sarroyomart/Arrivo/issues",
+  privacyEmail: "mailto:sarroyomart@gmail.com",
   privacyPolicy:
     "https://github.com/sarroyomart/Arrivo/blob/main/Docs/privacy-policy.md",
   osmCopyright: "https://www.openstreetmap.org/copyright",

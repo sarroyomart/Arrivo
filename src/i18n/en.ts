@@ -147,14 +147,15 @@ export const en: Messages = {
       "You can pick an audio file from this device as a tone. It is copied into the app folder and is not uploaded.",
     thirdPartiesTitle: "Third parties",
     thirdPartiesBody:
-      "OpenStreetMap Foundation (Nominatim, United Kingdom), Hyperknot Software Kft. / OpenFreeMap (Hungary), and Cloudflare (tile delivery). Android may use Google Play Services for fused location on-device. This version does not use AdMob or the advertising ID.",
+      "OpenStreetMap Foundation (Nominatim, United Kingdom), Hyperknot Software Kft. / OpenFreeMap (Hungary), and Cloudflare (tile delivery). Android may use Google Play Services for fused location on-device. This version does not use AdMob or the advertising ID. Arrivo does not use Firebase Cloud Messaging, Analytics, or Crashlytics. The Android notifications library may include unused Firebase Messaging code; it is not initialized (no Firebase project) and does not send push or analytics.",
     rightsTitle: "Your choices",
     rightsBody:
       "You can delete alarms in the app or uninstall Arrivo to remove local data. There is no cloud profile to request. The map shows “© OpenStreetMap contributors”; map data is licensed under ODbL.",
     contactTitle: "Contact",
     contactBody:
-      "There is no in-app account. Open an issue on the Arrivo GitHub repository for privacy questions.",
+      "Data controller: Sergio Arroyo Martín, developer of Arrivo on Google Play. There is no in-app account. Privacy questions: sarroyomart@gmail.com. You can also open an issue on the Arrivo GitHub repository.",
     openInBrowser: "Open full policy",
+    openEmail: "Email privacy contact",
     openContact: "Open GitHub issues",
     licensesIntro:
       "Arrivo includes open-source software. These are the main licenses for the binary and map data.",

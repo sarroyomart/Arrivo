@@ -139,6 +139,7 @@ export type Messages = {
     contactTitle: string;
     contactBody: string;
     openInBrowser: string;
+    openEmail: string;
     openContact: string;
     licensesIntro: string;
     licensesList: string;

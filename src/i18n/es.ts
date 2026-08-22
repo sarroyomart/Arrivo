@@ -147,14 +147,15 @@ export const es: Messages = {
       "Puedes elegir un archivo de audio del dispositivo como tono. Se copia a la carpeta de la app y no se envía a ningún servidor.",
     thirdPartiesTitle: "Terceros",
     thirdPartiesBody:
-      "OpenStreetMap Foundation (Nominatim, Reino Unido), Hyperknot Software Kft. / OpenFreeMap (Hungría) y Cloudflare (red de entrega de teselas). Google Play Services puede usarse en Android para la ubicación fusionada en el dispositivo. No usamos AdMob ni identificador de publicidad en esta versión.",
+      "OpenStreetMap Foundation (Nominatim, Reino Unido), Hyperknot Software Kft. / OpenFreeMap (Hungría) y Cloudflare (red de entrega de teselas). Google Play Services puede usarse en Android para la ubicación fusionada en el dispositivo. No usamos AdMob ni identificador de publicidad en esta versión. Arrivo no usa Firebase Cloud Messaging, Analytics ni Crashlytics. La librería de notificaciones de Android puede incluir código no usado de Firebase Messaging; no está inicializado (no hay proyecto Firebase) y no envía push ni analítica.",
     rightsTitle: "Tus opciones",
     rightsBody:
       "Puedes borrar alarmas en la app o desinstalar Arrivo para eliminar los datos locales. No hay perfil en la nube que solicitar. El mapa muestra “© OpenStreetMap contributors”; los datos cartográficos están bajo ODbL.",
     contactTitle: "Contacto",
     contactBody:
-      "No hay cuenta en la app. Para preguntas de privacidad, abre un issue en el repositorio de Arrivo en GitHub.",
+      "Responsable: Sergio Arroyo Martín, desarrollador de Arrivo en Google Play. No hay cuenta en la app. Preguntas de privacidad: sarroyomart@gmail.com. También puedes abrir un issue en el repositorio de Arrivo en GitHub.",
     openInBrowser: "Abrir política completa",
+    openEmail: "Escribir al email de privacidad",
     openContact: "Abrir issues de GitHub",
     licensesIntro:
       "Arrivo incluye software de código abierto. Estas son las licencias principales del binario y de los datos del mapa.",

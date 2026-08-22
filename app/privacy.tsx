@@ -43,6 +43,15 @@ export default function PrivacyScreen() {
         <Pressable
           accessibilityRole="link"
           onPress={() => {
+            void Linking.openURL(LEGAL_URLS.privacyEmail);
+          }}
+          className="min-h-touch justify-center"
+        >
+          <Text className="typo-body-medium text-primary">{t("legal.openEmail")}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => {
             void Linking.openURL(LEGAL_URLS.issues);
           }}
           className="min-h-touch justify-center"

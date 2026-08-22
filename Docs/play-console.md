@@ -6,9 +6,8 @@ Textos listos para pegar **después** de subir el AAB del perfil `production` (`
 
 <https://github.com/sarroyomart/Arrivo/blob/main/Docs/privacy-policy.md>
 
-Contacto de privacidad (issues): <https://github.com/sarroyomart/Arrivo/issues>
-
-Si Play exige un **email** en la política, usa el de la cuenta de desarrollador de Play Console (no hace falta publicarlo en el repo).
+Contacto de privacidad: Sergio Arroyo Martín · <sarroyomart@gmail.com>  
+Issues: <https://github.com/sarroyomart/Arrivo/issues>
 
 Genera el AAB solo con:
 
@@ -81,7 +80,7 @@ Preguntas frecuentes:
 
 No declares el permiso `AD_ID`. Está en `blockedPermissions`.
 
-No marques Firebase Cloud Messaging / analítica: el stub `ExpoFirebaseMessagingService` de `expo-notifications` no se usa como push de producto.
+No marques Firebase Cloud Messaging / analítica como producto: no hay `google-services.json` ni push. La política ya explica que `expo-notifications` puede incluir código no inicializado de Firebase Messaging. Si el informe de SDKs del AAB lista Firebase, no contradigas la política; no declares IDs ni mensajería como datos que la app usa.
 
 ---
 

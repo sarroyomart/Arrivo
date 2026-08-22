@@ -31,6 +31,8 @@ You may pick an audio file on the device as an alarm tone. It is copied into the
 
 OpenStreetMap Foundation (Nominatim), Hyperknot Software Kft. / OpenFreeMap, Cloudflare, and on Android Google Play Services for fused location on-device. This version does not use AdMob, the advertising ID, the microphone, or draw-over-other-apps.
 
+Arrivo does not use Firebase Cloud Messaging, Analytics, or Crashlytics. The Android notifications library may include unused Firebase Messaging code; it is not initialized (no Firebase project) and does not send push or analytics.
+
 ### Your choices
 
 Delete alarms in the app or uninstall Arrivo to remove local data. There is no cloud profile to request.
@@ -39,8 +41,11 @@ Map data © OpenStreetMap contributors, licensed under the Open Database License
 
 ### Contact
 
+Data controller: Sergio Arroyo Martín, developer of Arrivo on Google Play.
+
+Email: <sarroyomart@gmail.com>  
 Project repository: <https://github.com/sarroyomart/Arrivo>  
-Privacy questions: <https://github.com/sarroyomart/Arrivo/issues>
+GitHub issues: <https://github.com/sarroyomart/Arrivo/issues>
 
 ---
 
@@ -64,6 +69,8 @@ Puedes elegir un archivo de audio del dispositivo como tono. Se copia a la carpe
 
 OpenStreetMap Foundation (Nominatim), Hyperknot Software Kft. / OpenFreeMap, Cloudflare y, en Android, Google Play Services para la ubicación fusionada en el dispositivo. Esta versión no usa AdMob, identificador de publicidad, micrófono ni superposición sobre otras apps.
 
+Arrivo no usa Firebase Cloud Messaging, Analytics ni Crashlytics. La librería de notificaciones de Android puede incluir código no usado de Firebase Messaging; no está inicializado (no hay proyecto Firebase) y no envía push ni analítica.
+
 ### Tus opciones
 
 Borra alarmas en la app o desinstala Arrivo para eliminar los datos locales. No hay perfil en la nube.
@@ -72,5 +79,8 @@ Datos del mapa © OpenStreetMap contributors, bajo Open Database License (ODbL).
 
 ### Contacto
 
+Responsable: Sergio Arroyo Martín, desarrollador de Arrivo en Google Play.
+
+Email: <sarroyomart@gmail.com>  
 Repositorio: <https://github.com/sarroyomart/Arrivo>  
-Preguntas de privacidad: <https://github.com/sarroyomart/Arrivo/issues>
+Issues de GitHub: <https://github.com/sarroyomart/Arrivo/issues>
