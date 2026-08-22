@@ -745,7 +745,7 @@ class LocationForegroundService : Service() {
       }
     }
 
-    fun startFromArmed(context: Context, armed: ArmedTracking) {
+    internal fun startFromArmed(context: Context, armed: ArmedTracking) {
       if (!armed.hasAlarms) {
         return
       }
