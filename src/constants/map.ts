@@ -1,6 +1,6 @@
 /**
- * OpenStreetMap via MapLibre + OpenFreeMap.
- * Vector tiles, no API key, no monthly quota.
+ * OpenStreetMap via MapLibre + OpenFreeMap vector tiles.
+ * No Google Maps, no react-native-maps, no API key, no monthly quota.
  * https://openfreemap.org/quick_start/
  */
 export const OSM_STYLE_URL = {

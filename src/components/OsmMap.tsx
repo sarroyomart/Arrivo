@@ -27,8 +27,10 @@ type OsmMapProps = {
 };
 
 /**
- * OpenStreetMap canvas (MapLibre + OpenFreeMap). Requires a development build;
- * not available in Expo Go. Does not use Google Maps (no API key).
+ * OpenStreetMap canvas via MapLibre + OpenFreeMap vector tiles.
+ * Shared by every map view (home, picker, preview, ringing).
+ * Requires a development build; not available in Expo Go.
+ * Does not use Google Maps or react-native-maps (no API key).
  */
 export function OsmMap({
   children,

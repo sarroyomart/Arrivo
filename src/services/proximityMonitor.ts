@@ -64,7 +64,7 @@ function onCoords(latitude: number, longitude: number): void {
   seeded.value = true;
 }
 
-export function setProximityAlarms(nextAlarms: GeoAlarm[]): void {
+function setProximityAlarms(nextAlarms: GeoAlarm[]): void {
   alarms = nextAlarms.filter((alarm) => alarm.isActive);
   retainKnownIds(alarms);
   if (alarms.length === 0) {

@@ -106,7 +106,6 @@ export const es: Messages = {
     openSettings: "Abrir Ajustes del Sistema",
   },
   foregroundService: {
-    channelName: "Seguimiento de destino",
     title: "Arrivo activo",
     body: "Vigilando tus alarmas de destino",
     near: "A {{distance}} de {{title}}",
@@ -132,7 +131,6 @@ export const es: Messages = {
     cta: "Crear alarma",
   },
   buttons: {
-    createAlarm: "+ Nueva alarma",
     stopAlarm: "Desconectar / Apagar alarma",
     snooze: "Posponer (Snooze)",
     snoozeMinutes: "{{minutes}} min",

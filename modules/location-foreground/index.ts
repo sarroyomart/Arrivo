@@ -45,28 +45,12 @@ export async function stopBackgroundTracking(): Promise<void> {
   await module.stopBackgroundTracking();
 }
 
-export async function updateActiveAlarms(alarms: NativeTrackedAlarm[]): Promise<void> {
-  const module = native();
-  if (!module) {
-    return;
-  }
-  await module.updateActiveAlarms(JSON.stringify(alarms));
-}
-
 export async function drainPendingRingingAlarmId(): Promise<string | null> {
   const module = native();
   if (!module) {
     return null;
   }
   return module.drainPendingRingingAlarmId();
-}
-
-export async function isBackgroundTracking(): Promise<boolean> {
-  const module = native();
-  if (!module) {
-    return false;
-  }
-  return module.isTracking();
 }
 
 export function addGeofenceTriggerListener(

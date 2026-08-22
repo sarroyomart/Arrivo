@@ -42,7 +42,7 @@ export type AlarmSystemTone = "default" | "gentle" | "urgent";
 
 export type SystemSoundKind = "alarm" | "notification" | "ringtone";
 
-export const ALARM_SOUND_MODES: readonly AlarmSoundMode[] = [
+const ALARM_SOUND_MODES: readonly AlarmSoundMode[] = [
   "system",
   "custom",
   "vibration",
@@ -54,7 +54,7 @@ export const ALARM_SYSTEM_TONES: readonly AlarmSystemTone[] = [
   "urgent",
 ] as const;
 
-export const SYSTEM_SOUND_KINDS: readonly SystemSoundKind[] = [
+const SYSTEM_SOUND_KINDS: readonly SystemSoundKind[] = [
   "alarm",
   "notification",
   "ringtone",

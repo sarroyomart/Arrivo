@@ -6,7 +6,7 @@ import type { MessageKey } from "@/src/i18n";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-export const ALARM_ICON_IONICONS: Record<AlarmIconType, IconName> = {
+const ALARM_ICON_IONICONS: Record<AlarmIconType, IconName> = {
   pin: "location",
   home: "home",
   briefcase: "briefcase",

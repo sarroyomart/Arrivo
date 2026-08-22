@@ -5,7 +5,6 @@ import {
   drainPendingRingingAlarmId,
   startBackgroundTracking,
   stopBackgroundTracking,
-  updateActiveAlarms,
   type NativeTrackedAlarm,
   type OngoingTrackingCopy,
 } from "@/modules/location-foreground";
@@ -105,28 +104,6 @@ export async function reconcileLocationForeground(): Promise<void> {
   });
 
   return reconciling;
-}
-
-export async function syncNativeActiveAlarms(): Promise<void> {
-  if (Platform.OS !== "android") {
-    return;
-  }
-  const active = (await getAlarms()).filter((alarm) => alarm.isActive);
-  if (active.length === 0) {
-    await stopBackgroundTracking();
-    stopProximityMonitor();
-    return;
-  }
-  if (AppState.currentState === "active") {
-    await startProximityMonitor(active);
-    return;
-  }
-  try {
-    await updateActiveAlarms(toNativeAlarms(active));
-  } catch (error) {
-    console.warn("[Arrivo] Failed to update native active alarms", error);
-    await reconcileLocationForeground();
-  }
 }
 
 async function handleNativeTrigger(alarmId: string): Promise<void> {

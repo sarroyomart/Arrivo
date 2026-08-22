@@ -76,7 +76,12 @@ export async function getAlarms(): Promise<GeoAlarm[]> {
 }
 
 async function writeAlarms(alarms: GeoAlarm[]): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEYS.alarms, JSON.stringify(sortAlarms(alarms)));
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.alarms, JSON.stringify(sortAlarms(alarms)));
+  } catch (error) {
+    console.warn("[Arrivo] Failed to persist alarms", error);
+    throw error;
+  }
 }
 
 export async function upsertAlarm(alarm: GeoAlarm): Promise<void> {

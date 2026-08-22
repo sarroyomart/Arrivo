@@ -25,7 +25,6 @@ let player: AudioPlayer | null = null;
 let starting: Promise<void> | null = null;
 let previewPlayer: AudioPlayer | null = null;
 let vibrationTimer: ReturnType<typeof setInterval> | null = null;
-let playingSystemSound = false;
 
 const VIBRATION_PATTERN = [0, 500, 250, 500] as const;
 
@@ -89,16 +88,13 @@ async function startNativeSystemSound(config: AlarmSoundConfig, loop: boolean): 
     return false;
   }
   await playSystemSound(uri, loop);
-  playingSystemSound = true;
   return true;
 }
 
 async function stopNativeSystemSound(): Promise<void> {
   if (!canUseAndroidSystemSounds()) {
-    playingSystemSound = false;
     return;
   }
-  playingSystemSound = false;
   try {
     await stopSystemSound();
   } catch {
@@ -129,7 +125,6 @@ async function startBundledNativeSound(
   }
   const file = ALARM_SOUND_FILES[alarmSystemToneOf(config.systemTone)];
   await playRawResource(file, loop);
-  playingSystemSound = true;
   await acquireAlarmWakeLock();
   return true;
 }
@@ -222,7 +217,6 @@ export async function startAlarmAudio(config?: AlarmSoundConfig): Promise<void> 
     if (resolved.mode === "custom" && resolved.customUri && canUseAndroidSystemSounds()) {
       try {
         await playSystemSound(resolved.customUri, true);
-        playingSystemSound = true;
         await acquireAlarmWakeLock();
         return;
       } catch {

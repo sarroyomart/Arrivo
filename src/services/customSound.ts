@@ -17,7 +17,7 @@ const MIME_TO_EXT: Record<string, string> = {
   "audio/aac": ".m4a",
 };
 
-export function customSoundExtensionOf(name: string, mimeType?: string): string | null {
+function customSoundExtensionOf(name: string, mimeType?: string): string | null {
   const match = /\.[^.]+$/.exec(name.trim().toLowerCase());
   if (match && (ALLOWED_EXTENSIONS as readonly string[]).includes(match[0])) {
     return match[0];

@@ -96,7 +96,6 @@ export type Messages = {
     openSettings: string;
   };
   foregroundService: {
-    channelName: string;
     title: string;
     body: string;
     near: string;
@@ -122,7 +121,6 @@ export type Messages = {
     cta: string;
   };
   buttons: {
-    createAlarm: string;
     stopAlarm: string;
     snooze: string;
     snoozeMinutes: string;

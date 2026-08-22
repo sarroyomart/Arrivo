@@ -5,7 +5,9 @@
  * of those same semantic tokens (Penpot phase 1 shipped light only).
  *
  * Screens must use these class names (`bg-canvas`, `text-foreground`, `bg-brand`,
- * `dark:bg-canvas-dark`, …). Do not introduce ad-hoc hex in UI code.
+ * `text-muted`, `border-border`, …). Dark mode is applied by swapping CSS variables
+ * on `.dark` in `global.css` (ThemeProvider adds the class). Do not introduce
+ * ad-hoc hex in UI code.
  * Zone / map APIs that need a raw hex should import `src/constants/palette.ts`.
  */
 module.exports = {
@@ -34,39 +36,21 @@ module.exports = {
         },
         // Surfaces
         bg: "var(--color-canvas)",
-        canvas: {
-          DEFAULT: "var(--color-canvas)",
-          dark: "#09090B",
-        },
+        canvas: "var(--color-canvas)",
         surface: "var(--color-card)",
-        card: {
-          DEFAULT: "var(--color-card)",
-          dark: "#18181B",
-        },
+        card: "var(--color-card)",
         "surface-elevated": "var(--color-card)",
-        map: {
-          DEFAULT: "var(--color-map)",
-          dark: "#1E293B",
-        },
+        map: "var(--color-map)",
         overlay: "var(--color-overlay)",
         // Text
         text: {
           DEFAULT: "var(--color-foreground)",
           muted: "var(--color-muted)",
         },
-        foreground: {
-          DEFAULT: "var(--color-foreground)",
-          dark: "#FAFAFA",
-        },
-        muted: {
-          DEFAULT: "var(--color-muted)",
-          dark: "#A1A1AA",
-        },
+        foreground: "var(--color-foreground)",
+        muted: "var(--color-muted)",
         // Stroke
-        border: {
-          DEFAULT: "var(--color-border)",
-          dark: "#27272A",
-        },
+        border: "var(--color-border)",
         // Status
         danger: {
           DEFAULT: "var(--color-danger)",
