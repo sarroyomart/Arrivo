@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Semantic color tokens from Penpot (`design/tokens.json`).
+ * Light = exported values. Dark = MD3 counterparts of the same names.
+ * NativeWind `dark:` and `colorScheme.set('dark')` activate the `.dark` class.
+ */
+
+:root {
+  --color-primary: #ea580c;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ffdcc2;
+  --color-on-primary-container: #2e1500;
+  --color-primary-hover: #c2410c;
+  --color-primary-focus: #fdba74;
+  --color-canvas: #fafafa;
+  --color-card: #ffffff;
+  --color-map: #f1f5f9;
+  --color-foreground: #09090b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  --color-success: #16a34a;
+  --color-success-soft: #dcfce7;
+  --color-alarm-inactive: #71717a;
+  --color-alarm-inactive-soft: #f4f4f5;
+  --color-geofence-fill: #ea580c26;
+  --color-geofence-stroke: #ea580c;
+  --color-overlay: #09090b80;
+  --color-zone-orange: #ea580c;
+  --color-zone-teal: #14b8a6;
+  --color-zone-blue: #3b82f6;
+  --color-zone-violet: #8b5cf6;
+  --color-zone-rose: #f43f5e;
+  --color-zone-slate: #64748b;
+}
+
+.dark {
+  --color-primary: #ea580c;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #7c2d12;
+  --color-on-primary-container: #ffdcc2;
+  --color-primary-hover: #f97316;
+  --color-primary-focus: #9a3412;
+  --color-canvas: #09090b;
+  --color-card: #18181b;
+  --color-map: #1e293b;
+  --color-foreground: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-border: #27272a;
+  --color-danger: #f87171;
+  --color-danger-soft: #7f1d1d;
+  --color-success: #22c55e;
+  --color-success-soft: #14532d;
+  --color-alarm-inactive: #a1a1aa;
+  --color-alarm-inactive-soft: #27272a;
+  --color-geofence-fill: #ea580c26;
+  --color-geofence-stroke: #ea580c;
+  --color-overlay: #09090bcc;
+  --color-zone-orange: #ea580c;
+  --color-zone-teal: #14b8a6;
+  --color-zone-blue: #3b82f6;
+  --color-zone-violet: #8b5cf6;
+  --color-zone-rose: #f43f5e;
+  --color-zone-slate: #64748b;
+}
+
+@layer components {
+  .typo-display {
+    @apply font-sans-bold text-display text-foreground;
+  }
+
+  .typo-title {
+    @apply font-sans-semibold text-title text-foreground;
+  }
+
+  .typo-h2 {
+    @apply font-sans-semibold text-h2 text-foreground;
+  }
+
+  .typo-body {
+    @apply font-sans text-body text-foreground;
+  }
+
+  .typo-body-medium {
+    @apply font-sans-medium text-body text-foreground;
+  }
+
+  .typo-caption {
+    @apply font-sans text-caption text-muted;
+  }
+
+  .typo-button {
+    @apply font-sans-medium text-button;
+  }
+}

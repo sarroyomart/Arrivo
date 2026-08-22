@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "apple"],
+  "apple": {
+    "modules": ["SystemSoundsModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.systemsounds.SystemSoundsModule"]
+  }
+}

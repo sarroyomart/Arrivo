@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "apple"],
+  "apple": {
+    "modules": ["LocationServiceModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.locationforeground.LocationServiceModule"]
+  }
+}

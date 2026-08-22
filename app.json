@@ -1,0 +1,100 @@
+{
+  "expo": {
+    "name": "Arrivo",
+    "slug": "arrivo",
+    "scheme": "arrivo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000",
+      "dark": {
+        "backgroundColor": "#000000"
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arrivo.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Arrivo uses your location only while the app is open, so you can place alarms on the map. Location stays on this device and is not sent to external servers.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+        "NSLocationAlwaysUsageDescription": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+        "UIBackgroundModes": ["location", "audio", "fetch"]
+      }
+    },
+    "android": {
+      "package": "com.arrivo.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "POST_NOTIFICATIONS",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "android.permission.USE_FULL_SCREEN_INTENT",
+        "android.permission.ACCESS_NOTIFICATION_POLICY"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Arrivo uses your location only while the app is open, so you can place alarms on the map. Location stays on this device and is not sent to external servers.",
+          "locationAlwaysAndWhenInUsePermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+          "locationAlwaysPermission": "Arrivo reads your location in the background only during trips with active alarms, so it can ring when you enter a saved place. There is no permanent tracking; coordinates stay on this device.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/alarm.wav",
+            "./assets/sounds/gentle.wav",
+            "./assets/sounds/urgent.wav"
+          ]
+        }
+      ],
+      "./plugins/withAlarmLockScreen",
+      "./plugins/withForegroundLocation",
+      "expo-task-manager",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "enableBackgroundPlayback": true
+        }
+      ],
+      "expo-localization",
+      "expo-document-picker",
+      "expo-file-system",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-dev-client",
+      "@maplibre/maplibre-react-native"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
