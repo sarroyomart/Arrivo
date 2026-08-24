@@ -116,6 +116,8 @@ En el formulario de Play:
 - Cuándo: **en uso** (primer plano). **No** marcar ubicación en segundo plano.
 - Uso: funcionalidad de la app (alarmas de destino)
 
+La cadencia GPS adaptativa (intervalos 12 s → 1 s, `PRIORITY_HIGH_ACCURACY`, ajuste por velocidad) es detalle de implementación en el dispositivo. **No** cambia este formulario, Data Safety, ni la política: no hay permiso nuevo, no hay `ACCESS_BACKGROUND_LOCATION`, el GPS del trayecto no se sube. Especificación: [`location-tracking.md`](location-tracking.md).
+
 ---
 
 ## Foreground service (FGS)

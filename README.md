@@ -18,6 +18,7 @@ Alarmas de lugar para iOS y Android: **cuando entras en el radio de un destino g
 | **GitHub** | [github.com/sarroyomart/Arrivo](https://github.com/sarroyomart/Arrivo) |
 | **Stack** | Expo Router · TypeScript · NativeWind v4 · AsyncStorage |
 | **Plan de producto** | [`Docs/plan.md`](Docs/plan.md) |
+| **GPS / cadencia** | [`Docs/location-tracking.md`](Docs/location-tracking.md) |
 | **Sistema de diseño** | [`design/DESIGN.md`](design/DESIGN.md) · [`design/tokens.json`](design/tokens.json) |
 
 ```bash
@@ -431,4 +432,4 @@ No forman parte de esta versión: repetición por días de la semana, Wi‑Fi co
 
 ## Licencia y privacidad
 
-Uso personal / proyecto privado (`"private": true`). El GPS de las alarmas se procesa en el dispositivo. Nominatim recibe la consulta si el usuario pulsa buscar; OpenFreeMap sirve las teselas del mapa. Política de privacidad: [`Docs/privacy-policy.md`](Docs/privacy-policy.md). Declaraciones de Play Console (Data Safety, FGS, ubicación): [`Docs/play-console.md`](Docs/play-console.md). Avisos Apache / OFL: [`NOTICE`](NOTICE).
+Uso personal / proyecto privado (`"private": true`). El GPS de las alarmas se procesa en el dispositivo. Nominatim recibe la consulta si el usuario pulsa buscar; OpenFreeMap sirve las teselas del mapa. Política de privacidad: [`Docs/privacy-policy.md`](Docs/privacy-policy.md). Cadencia GPS: [`Docs/location-tracking.md`](Docs/location-tracking.md). Declaraciones de Play Console (Data Safety, FGS, ubicación): [`Docs/play-console.md`](Docs/play-console.md). Avisos Apache / OFL: [`NOTICE`](NOTICE).

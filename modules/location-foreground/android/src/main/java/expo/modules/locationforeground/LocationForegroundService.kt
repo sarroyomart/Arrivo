@@ -225,6 +225,7 @@ class LocationForegroundService : Service() {
     val request = LocationRequest.Builder(sampling.priority, sampling.intervalMs)
       .setMinUpdateIntervalMillis(sampling.minIntervalMs)
       .setMinUpdateDistanceMeters(sampling.minDistanceMeters)
+      .setMaxUpdateDelayMillis(sampling.intervalMs)
       .setWaitForAccurateLocation(false)
       .build()
     fusedClient.requestLocationUpdates(request, fusedCallback, Looper.getMainLooper())
@@ -266,11 +267,11 @@ class LocationForegroundService : Service() {
   }
 
   @SuppressLint("MissingPermission")
-  private fun adaptLocationSampling(remainingMeters: Float) {
+  private fun adaptLocationSampling(remainingMeters: Float, speedMps: Float) {
     if (!hasLocationPermission()) {
       return
     }
-    val next = samplingFor(remainingMeters, currentSampling)
+    val next = samplingFor(remainingMeters, currentSampling, speedMps)
     if (next == currentSampling) {
       return
     }
@@ -328,6 +329,7 @@ class LocationForegroundService : Service() {
   }
 
   private fun onLocation(location: Location) {
+    val speedMps = speedMetersPerSecond(location, lastKnownLocation)
     lastKnownLocation = location
     if (alarms.isEmpty()) {
       shutdown()
@@ -371,10 +373,24 @@ class LocationForegroundService : Service() {
     seeded = true
 
     val nearest = findNearestAlarm(location) ?: return
-    adaptLocationSampling(nearest.remainingMeters)
+    adaptLocationSampling(nearest.remainingMeters, speedMps)
     if (shouldRefreshNotification(nearest)) {
       publishOngoingDistance(nearest)
     }
+  }
+
+  private fun speedMetersPerSecond(location: Location, previous: Location?): Float {
+    if (location.hasSpeed() && location.speed > 0f) {
+      return location.speed
+    }
+    if (previous == null) {
+      return 0f
+    }
+    val dtSec = (location.elapsedRealtimeNanos - previous.elapsedRealtimeNanos) / 1_000_000_000f
+    if (dtSec < 0.8f) {
+      return 0f
+    }
+    return previous.distanceTo(location) / dtSec
   }
 
   private fun notificationRefreshThreshold(remainingMeters: Float): Float {
@@ -789,55 +805,65 @@ class LocationForegroundService : Service() {
     stopSelf()
   }
 
-  private fun samplingFor(remainingMeters: Float, current: LocationSampling?): LocationSampling {
+  private fun samplingFor(
+    remainingMeters: Float,
+    current: LocationSampling?,
+    speedMps: Float = 0f,
+  ): LocationSampling {
     val meters = if (remainingMeters.isFinite() && remainingMeters > 0f) remainingMeters else 0f
+    // Highway speeds cover hundreds of meters between fixes; treat remaining as closer.
+    val effective = when {
+      speedMps >= HIGHWAY_SPEED_MPS -> meters / 4f
+      speedMps >= DRIVING_SPEED_MPS -> meters / 2.5f
+      else -> meters
+    }
     val far = LocationSampling(
-      intervalMs = 40_000L,
-      minIntervalMs = 20_000L,
-      minDistanceMeters = 120f,
-      priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+      intervalMs = 12_000L,
+      minIntervalMs = 6_000L,
+      minDistanceMeters = 50f,
+      priority = Priority.PRIORITY_HIGH_ACCURACY,
     )
     val mid = LocationSampling(
-      intervalMs = 15_000L,
-      minIntervalMs = 8_000L,
-      minDistanceMeters = 50f,
-      priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-    )
-    val near = LocationSampling(
       intervalMs = 6_000L,
       minIntervalMs = 3_000L,
-      minDistanceMeters = 20f,
+      minDistanceMeters = 25f,
+      priority = Priority.PRIORITY_HIGH_ACCURACY,
+    )
+    val near = LocationSampling(
+      intervalMs = 3_000L,
+      minIntervalMs = 1_000L,
+      minDistanceMeters = 10f,
       priority = Priority.PRIORITY_HIGH_ACCURACY,
     )
     val close = LocationSampling(
-      intervalMs = 2_000L,
-      minIntervalMs = 1_000L,
-      minDistanceMeters = 8f,
+      intervalMs = 1_000L,
+      minIntervalMs = 500L,
+      minDistanceMeters = 5f,
       priority = Priority.PRIORITY_HIGH_ACCURACY,
     )
 
     if (current == null) {
       return when {
-        meters >= SAMPLING_FAR_METERS -> far
-        meters >= SAMPLING_MID_METERS -> mid
-        meters >= SAMPLING_NEAR_METERS -> near
+        effective >= SAMPLING_FAR_METERS -> far
+        effective >= SAMPLING_MID_METERS -> mid
+        effective >= SAMPLING_NEAR_METERS -> near
         else -> close
       }
     }
 
     return when (current.intervalMs) {
-      far.intervalMs -> if (meters < 4_000f) mid else far
+      far.intervalMs -> if (effective < 4_000f) mid else far
       mid.intervalMs -> when {
-        meters >= 6_000f -> far
-        meters < 900f -> near
+        effective >= 6_000f -> far
+        effective < 900f -> near
         else -> mid
       }
       near.intervalMs -> when {
-        meters >= 1_500f -> mid
-        meters < 220f -> close
+        effective >= 1_500f -> mid
+        effective < 220f -> close
         else -> near
       }
-      else -> if (meters >= 350f) near else close
+      else -> if (effective >= 350f) near else close
     }
   }
 
@@ -882,6 +908,8 @@ class LocationForegroundService : Service() {
     private const val SAMPLING_FAR_METERS = 5_000f
     private const val SAMPLING_MID_METERS = 1_200f
     private const val SAMPLING_NEAR_METERS = 300f
+    private const val DRIVING_SPEED_MPS = 8f
+    private const val HIGHWAY_SPEED_MPS = 20f
 
     val isRunning = AtomicBoolean(false)
 

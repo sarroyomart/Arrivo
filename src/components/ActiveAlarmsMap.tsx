@@ -29,9 +29,9 @@ import type { GeoAlarm } from "@/src/types/alarm";
 import { formatDistanceMeters, haversineMeters } from "@/src/utils/geo";
 
 const LOCATION_WATCH = {
-  accuracy: Location.Accuracy.Balanced,
-  distanceInterval: 8,
-  timeInterval: 2_000,
+  accuracy: Location.Accuracy.High,
+  distanceInterval: 5,
+  timeInterval: 1_000,
 } as const;
 
 type ActiveAlarmsMapProps = {
@@ -223,7 +223,7 @@ export function ActiveAlarmsMap({ alarms }: ActiveAlarmsMapProps) {
           return;
         }
         const position = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
+          accuracy: Location.Accuracy.High,
         });
         const next = toCoordinate(position.coords);
         if (next) {

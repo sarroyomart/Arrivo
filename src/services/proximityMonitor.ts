@@ -6,9 +6,9 @@ import { alarmTriggerOf, type GeoAlarm } from "@/src/types/alarm";
 import { haversineMeters } from "@/src/utils/geo";
 
 const LOCATION_WATCH = {
-  accuracy: Location.Accuracy.Balanced,
-  distanceInterval: 15,
-  timeInterval: 3_000,
+  accuracy: Location.Accuracy.High,
+  distanceInterval: 8,
+  timeInterval: 2_000,
 } as const;
 
 let subscription: Location.LocationSubscription | null = null;
